@@ -1,7 +1,7 @@
 # Cache layer
-Cache layer for PHP applications
+Cache layer for PHP applications using the on Chain of responsability pattern.
 
-## Drivers
+## Drivers Available
 - InMemory
 - FileSystem
 - SQL
@@ -12,3 +12,5 @@ Cache layer for PHP applications
 - Redis
   - Native (php5-redis)
   - Client (Predis)
+
+## Usage
