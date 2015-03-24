@@ -1,5 +1,5 @@
 imports:
-    - { resource: parameters.yml }
+    - { resource: cache_parameters.yml }
 
 services:
     nil_portugues.cache:
