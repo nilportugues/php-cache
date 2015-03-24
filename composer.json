@@ -1,0 +1,40 @@
+{
+    "name": "nilportugues/cache",
+    "description": "Cache layer for PHP applications using the on Chain of responsability pattern",
+    "keywords": ["cache", "sphinx", "sql", "sphinxql", "elasticsearch", "file", "memcached", "mysql", "mongo", "mongodb", "redis", "predis", "nil portugues", "nilportugues"],
+    "type": "library",
+    "homepage": "http://nilportugues.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nil Portugués",
+            "email": "contact@nilportugues.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.2",
+        "fiunchinho/phpunit-randomizer": "1.0.*@dev",
+        "fabpot/php-cs-fixer": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "NilPortugues\\Cache\\": "src/",
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NilPortugues\\Tests\\Cache\\": "tests/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin/"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }  
+}
