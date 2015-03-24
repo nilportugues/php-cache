@@ -8,6 +8,7 @@ Cache layer for PHP applications using the on Chain of responsability pattern.
 - SphinxQL
 - Sqlite
 - MongoDB
+- ElasticSearch
 - Memcached
 - Redis
   - Native (php5-redis)
