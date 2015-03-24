@@ -1,1 +1,38 @@
-
+parameters:
+  filesystem_config:
+    - path: /var/tmp
+    
+  mysql_config:
+    - host: localhost
+    - port: 3306
+    - database: ""
+    
+  sqlite_config:
+    - host: localhost
+    - port: 3306
+    - database: ""    
+    
+  sphinxql_config:
+    - host: localhost
+    - port: 3306
+    - database: ""    
+    
+  mongodb_config:
+    - host: localhost
+    - port: 3306
+    - database: ""
+    
+  memcached_config:
+    - host: localhost
+    - port: 3306
+    - database: ""    
+    
+  elasticsearch_config:
+    - host: localhost
+    - port: 3306
+    - database: ""       
+    
+  redis_config:
+    - host: localhost
+    - port: 3306
+    - database: ""    
