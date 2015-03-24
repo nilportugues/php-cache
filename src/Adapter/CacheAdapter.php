@@ -1,7 +1,7 @@
 <?php
 namespace NilPortugues\Cache;
 
-interface Cache
+interface CacheAdapter
 {
 
 }
