@@ -1,0 +1,11 @@
+imports:
+    - { resource: parameters.yml }
+
+services:
+    nil_portugues.cache:
+        class: Path\To\Class
+        arguments: 
+          - @nil_portugues.cache.adapter.in_memory_cache
+
+    nil_portugues.cache.adapter.in_memory_cache:
+        class: Path\To\Class
