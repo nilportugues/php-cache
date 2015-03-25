@@ -16,15 +16,21 @@ final class Cache implements CacheAdapter
 	/**
 	 * @var string
 	 */
-	private $namespace = '';
+	private $namespace;
+
+	/**
+	 * @var int
+	 */
+	private $expires;
 	
 	/**
 	* @param CacheAdapter|null $cache
 	*/
-	public function __construct(CacheAdapter $cache = null, $namespace = '')
+	public function __construct(CacheAdapter $cache = null, $namespace = '', $expires = 0)
 	{
 		$this->cache = (null === $cache) ? new InMemoryAdapter() : $cache;
 		$this->namespace = (empty($namespace)) ? '' : $namespace.".";
+		$this->expires = (int) $expires;
 	}
 	
 	public function get($key)
@@ -32,8 +38,9 @@ final class Cache implements CacheAdapter
 		return $this->cache->get($this->namespace.$key);
 	}
 	
-	public function set($key, $value, $ttl)
+	public function set($key, $value, $ttl = null)
 	{
+		$ttl = (null === $ttl) ? $this->expires : $ttl;
 		$this->cache->set($this->namespace.$key, $value, $ttl);
 		return $this;
 	}
