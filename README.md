@@ -1,5 +1,5 @@
 # Cache layer
-Cache layer for PHP applications using the on Chain of responsability pattern.
+Cache layer for PHP applications using the on the Chain of Responsability pattern.
 
 ### 1. Installation
 
@@ -24,7 +24,7 @@ php composer.phar require nilportugues/cache
 
 ### 3. Usage
 
-#### 3.1. Configuration of the Chain of Responsability
+#### 3.1. Configuration
 
 #### 3.2. Example
 
@@ -36,6 +36,8 @@ This set up is recommended when having a Redis as your main cache in the same ma
 - 1st level cache: Redis
 - 2nd level cache: Memcached
 - 3rd level cache: InMemory
+
+#### 4.1. Configuration 
 
 
 ### 5. Quality
