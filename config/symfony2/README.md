@@ -1,3 +1,3 @@
-#Syfmony 2 Configuration
+#Symfony 2 Configuration
 
 This directory holds an example for configuration files in a Symfony 2 project.
