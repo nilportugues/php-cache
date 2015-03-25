@@ -3,6 +3,9 @@ namespace NilPortugues\Cache;
 
 use NilPortugues\Cache\Adapter\InMemoryCache;
 
+/**
+ * 
+ */
 final class Cache implements CacheAdapter
 {
 	/**
