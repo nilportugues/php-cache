@@ -36,7 +36,8 @@ This set up is recommended when having a Redis as your main cache in the same ma
 - 1st level cache: Redis
 - 2nd level cache: Memcached
 - 3rd level cache: InMemory
-- 
+
+
 ### 5. Quality
 
 To run the PHPUnit tests at the command line, go to the tests directory and issue phpunit.
