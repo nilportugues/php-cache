@@ -22,6 +22,14 @@ interface CacheAdapter
     public function set($key, $value, $ttl = 0);
 
     /**
+     * Allows to set a default ttl value if none is provided for set()
+     *
+     * @param  int     $ttl
+     * @return bool|mixed
+     */
+    public function defaultTtl($ttl);
+    
+    /**
      * Delete a value identified by $key.
      *
      * @param  string     $key
