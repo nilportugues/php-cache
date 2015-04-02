@@ -11,11 +11,6 @@ use NilPortugues\Cache\CacheAdapter;
 class InMemoryAdapter implements CacheAdapter
 {
     /**
-     * @var CacheAdapter|null
-     */
-    private $next;
-
-    /**
      * @var bool
      */
     private $hit = false;
@@ -36,29 +31,16 @@ class InMemoryAdapter implements CacheAdapter
         $value = null;
         $this->hit = false;
 
-        if (array_key_exists($key, $this->registry)
-            && array_key_exists('expires', $this->registry[$key])
-            && $this->registry[$key]['expires'] >= strtotime('now')
-        ) {
-            $value = $this->registry[$key]['value'];
+        if (array_key_exists($key, $this->registry)) {
+            if ($this->registry[$key]['expires'] >= (new \DateTime())) {
+                $this->hit = true;
+                $value = $this->registry[$key]['value'];
+            } else {
+                unset($this->registry[$key]);
+            }
         }
-
-        $this->clearExpiredKey($key);
-
-        $this->hit = (null !== $value);
 
         return (is_object($value)) ? clone $value : $value;
-    }
-
-    /**
-     * Clear an item if it expired.
-     * @param $key
-     */
-    private function clearExpiredKey($key)
-    {
-        if ($this->registry[$key]['expires'] < strtotime('now')) {
-            unset($this->registry[$key]);
-        }
     }
 
     /**
@@ -71,14 +53,17 @@ class InMemoryAdapter implements CacheAdapter
      */
     public function set($key, $value, $ttl = 0)
     {
-        $ttl = (0 == $ttl) ? PHP_INT_MAX: $ttl;
-        $value = (is_object($value)) ? clone $value : $value;
+        if ($ttl >= 0) {
+            $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
+            if (0 == $ttl) {
+                $calculatedTtl = strtotime('now +10 years');
+            }
 
-        $this->registry[$key] = [
-            'value' => $value,
-            'expires' => strtotime(sprintf('now +%s seconds', $ttl))
-        ];
-
+            $this->registry[$key] = [
+                'value' => (is_object($value)) ? clone $value : $value,
+                'expires' => new \DateTime(date('Y-m-d H:i:s', $calculatedTtl))
+            ];
+        }
         return $this;
     }
 
@@ -123,8 +108,21 @@ class InMemoryAdapter implements CacheAdapter
      */
     public function clear()
     {
+        $currentDate = new \DateTime();
         foreach (array_keys($this->registry) as $key) {
-            $this->clearExpiredKey($key);
+            $this->clearExpiredKey($key, $currentDate);
+        }
+    }
+    /**
+     * Clear an item if it expired.
+     *
+     * @param $key
+     * @param \DateTime $dateTime
+     */
+    private function clearExpiredKey($key, \DateTime $dateTime)
+    {
+        if ($this->registry[$key]['expires'] < $dateTime) {
+            unset($this->registry[$key]);
         }
     }
 
