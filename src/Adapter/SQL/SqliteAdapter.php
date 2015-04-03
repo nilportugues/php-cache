@@ -1,6 +1,6 @@
 <?php
 
-namespace NilPortugues\Cache\Adapter\Sql;
+namespace NilPortugues\Cache\Adapter\SQL;
 
 use NilPortugues\Cache\CacheAdapter;
 
