@@ -151,7 +151,11 @@ class PredisAdapter extends Adapter implements CacheAdapter
      */
     public function delete($key)
     {
-        // TODO: Implement delete() method.
+        $this->redis->del($key);
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->delete($key);
+        }
     }
 
     /**
@@ -161,7 +165,9 @@ class PredisAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
-        // TODO: Implement clear() method.
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->clear();
+        }
     }
 
     /**
@@ -171,6 +177,10 @@ class PredisAdapter extends Adapter implements CacheAdapter
      */
     public function drop()
     {
-        // TODO: Implement drop() method.
+        $this->redis->flushDB();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->drop();
+        }
     }
 }
