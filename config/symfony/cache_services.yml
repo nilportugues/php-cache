@@ -4,7 +4,14 @@ imports:
 services:
     nil_portugues.cache.adapter.in_memory_adapter:
         class: NilPortugues\Cache\Adapter\InMemoryAdapter
-
+        
+    nil_portugues.cache.adapter.redis.native_adapter:
+        class: NilPortugues\Cache\Adapter\Redis\NativeAdapter
+        arguments:
+          - [%redis_servers%]
+          - @nil_portugues.cache.adapter.in_memory_adapter
+          - @nil_portugues.cache.adapter.in_memory_adapter
+          
     nil_portugues.cache.adapter.redis.predis_adapter:
         class: NilPortugues\Cache\Adapter\Redis\PredisAdapter
         arguments:
@@ -15,4 +22,4 @@ services:
     nil_portugues.cache:
         class: NilPortugues\Cache\Cache
         arguments:
-          - @nil_portugues.cache.adapter.redis.predis_adapter
+          - @nil_portugues.cache.adapter.redis.native_adapter
