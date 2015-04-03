@@ -30,9 +30,9 @@ As a fallback mechanism, lets suppose we decided to use Memcached, which is avai
 
 Finally, an application level cache, the InMemoryAdapter is used to avoid hiting the external caches on repeated operations.
 
-- 1st level cache: Redis (PredisAdapter)
-- 2nd level cache: Memcached (MemcachedAdapter)
-- Application cache: InMemoryAdapter
+- **1st level cache**: Redis (PredisAdapter)
+- **2nd level cache**: Memcached (MemcachedAdapter)
+- **Application cache**: InMemoryAdapter
 
 #### 3.1. Configuration 
 
