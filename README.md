@@ -22,36 +22,35 @@ php composer.phar require nilportugues/cache
   - Native (php5-redis)
   - Client (Predis)
 
-### 3. Usage
+### 3. Use case
 
-#### 3.1. Configuration
+Lets imagine we decided to use Redis as our main cache, being a dedicated server. This is our main cache.
 
-#### 3.2. Example
+As a fallback mechanism, lets suppose we decided to use Memcached, which is available to us in the same machine as our PHP script. 
+
+Finally, an application level cache, the InMemoryAdapter is used to avoid hiting the external caches on repeated operations.
+
+- 1st level cache: Redis (PredisAdapter)
+- 2nd level cache: Memcached (MemcachedAdapter)
+- Application cache: InMemoryAdapter
+
+#### 3.1. Configuration 
+
+#### 3.2. Usage
 
 
-### 4. Recommended Setup
-
-This set up is recommended when having a Redis as your main cache in the same machine or external, as a fallback Memcached to be used for the current machine and final fallback, InMemory that would act as a Registry.
-
-- 1st level cache: Redis
-- 2nd level cache: Memcached
-- 3rd level cache: InMemory
-
-#### 4.1. Configuration 
-
-
-### 5. Quality
+### 4. Quality
 
 To run the PHPUnit tests at the command line, go to the tests directory and issue phpunit.
 
 This library attempts to comply with PSR-1, PSR-2, and PSR-4. If you notice compliance oversights, please send a patch via pull request.
 
-### 6. Author [↑](#index_block)
+### 5. Author [↑](#index_block)
 Nil Portugués Calderó
 
  - <contact@nilportugues.com>
  - [http://nilportugues.com](http://nilportugues.com)
 
-### 7. License [↑](#index_block)
+### 6. License [↑](#index_block)
 The code base is licensed under the MIT license.
 
