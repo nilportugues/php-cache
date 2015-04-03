@@ -51,7 +51,7 @@ interface CacheAdapter
     public function isHit();
 
     /**
-     * Clears all  expired values from cache.
+     * Clears all expired values from cache.
      *
      * @return mixed
      */

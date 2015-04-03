@@ -159,7 +159,7 @@ class PredisAdapter extends Adapter implements CacheAdapter
     }
 
     /**
-     * Clears all  expired values from cache.
+     * Clears all expired values from cache.
      *
      * @return mixed
      */
