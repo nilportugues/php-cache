@@ -54,4 +54,20 @@ abstract class Adapter implements CacheAdapter
 
         $this->ttl = (int)$ttl;
     }
+
+
+    /**
+     * @param $ttl
+     *
+     * @return int|null
+     */
+    protected function fromDefaultTtl($ttl)
+    {
+        $ttl = (int) $ttl;
+
+        if (0 == $ttl && null !== $this->ttl) {
+            $ttl = $this->ttl;
+        }
+        return $ttl;
+    }
 }

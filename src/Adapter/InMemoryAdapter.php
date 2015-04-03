@@ -54,12 +54,8 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     public function set($key, $value, $ttl = 0)
     {
-        $key = (string)$key;
-        $ttl = (int)$ttl;
-
-        if (0 == $ttl && null !== $this->ttl) {
-            $ttl = $this->ttl;
-        }
+        $key = (string) $key;
+        $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
             $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
