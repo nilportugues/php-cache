@@ -37,17 +37,6 @@ class SqliteAdapter extends Adapter implements CacheAdapter
         // TODO: Implement set() method.
     }
 
-    /**
-     * Allows to set a default ttl value if none is provided for set()
-     *
-     * @param  int $ttl
-     *
-     * @return bool|mixed
-     */
-    public function defaultTtl($ttl)
-    {
-        // TODO: Implement defaultTtl() method.
-    }
 
     /**
      * Delete a value identified by $key.
@@ -67,16 +56,6 @@ class SqliteAdapter extends Adapter implements CacheAdapter
     public function isAvailable()
     {
         // TODO: Implement isAvailable() method.
-    }
-
-    /**
-     * Check if value was found in the cache or not.
-     *
-     * @return bool
-     */
-    public function isHit()
-    {
-        // TODO: Implement isHit() method.
     }
 
     /**
