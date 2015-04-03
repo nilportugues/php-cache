@@ -70,4 +70,24 @@ abstract class Adapter implements CacheAdapter
         }
         return $ttl;
     }
+
+    /**
+     * @param $value
+     *
+     * @return string
+     */
+    protected function storageDataStructure($value)
+    {
+        return serialize($value);
+    }
+
+    /**
+     * @param $value
+     *
+     * @return mixed
+     */
+    protected function restoreDataStructure($value)
+    {
+        return unserialize($value);
+    }
 }

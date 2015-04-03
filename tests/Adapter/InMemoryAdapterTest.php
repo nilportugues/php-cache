@@ -2,6 +2,7 @@
 
 namespace NilPortugues\Tests\Cache\Adapter;
 
+use DateTime;
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
 
 /**
@@ -11,92 +12,113 @@ use NilPortugues\Cache\Adapter\InMemoryAdapter;
 class InMemoryAdapterTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var InMemoryAdapter
+     */
+    protected $cache;
+
+    /**
      * @return InMemoryAdapter
      */
-    private function getCacheDriver()
+    protected  function setUp()
     {
-        return new InMemoryAdapter();
+        $this->cache = new InMemoryAdapter();
+    }
+    
+    protected function tearDown()
+    {
+        $this->cache = null;
     }
 
     public function testItCanGetAndReturnsNull()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key', 1, -1);
+        $this->cache->set('cached.value.key', 1, -1);
 
-        $this->assertEquals(null, $cache->get('cached.value.key'));
-        $this->assertFalse($cache->isHit());
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
     }
 
     public function testItCanGetAndReturnsValueWithTtl()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key', 1, 1000);
+        $this->cache->set('cached.value.key', 1, 1000);
 
-        $this->assertEquals(1, $cache->get('cached.value.key'));
-        $this->assertTrue($cache->isHit());
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
     }
 
     public function testItCanGetAndReturnsValueWithoutTtl()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key', 1);
+        $this->cache->set('cached.value.key', 1);
 
-        $this->assertEquals(1, $cache->get('cached.value.key'));
-        $this->assertTrue($cache->isHit());
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
     }
 
     public function testItCanGetDeleteAValue()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key', 1);
+        $this->cache->set('cached.value.key', 1);
 
-        $this->assertEquals(1, $cache->get('cached.value.key'));
-        $this->assertTrue($cache->isHit());
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
 
-        $cache->delete('cached.value.key');
-        $this->assertEquals(null, $cache->get('cached.value.key'));
-        $this->assertFalse($cache->isHit());
+        $this->cache->delete('cached.value.key');
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
     }
 
     public function testItCanGetAndReturnsValueAndWillExpire()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key', 1, 1);
+        $this->cache->set('cached.value.key', 1, 1);
 
         sleep(2); //Not a bug, Wait for 2 seconds.
-        $this->assertEquals(null, $cache->get('cached.value.key'));
-        $this->assertFalse($cache->isHit());
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
     }
 
     public function testItCanClearValues()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key1', 1, 1);
-        $cache->set('cached.value.key2', 2, 1);
+        $this->cache->set('cached.value.key1', 1, 1);
+        $this->cache->set('cached.value.key2', 2, 1);
 
-        $this->assertEquals(1, $cache->get('cached.value.key1'));
-        $this->assertEquals(2, $cache->get('cached.value.key2'));
+        $this->assertEquals(1, $this->cache->get('cached.value.key1'));
+        $this->assertEquals(2, $this->cache->get('cached.value.key2'));
 
         sleep(2); //Not a bug, Wait for 2 seconds.
-        $cache->clear();
-        $this->assertEquals(null, $cache->get('cached.value.key1'));
-        $this->assertEquals(null, $cache->get('cached.value.key2'));
+        $this->cache->clear();
+        $this->assertEquals(null, $this->cache->get('cached.value.key1'));
+        $this->assertEquals(null, $this->cache->get('cached.value.key2'));
     }
 
 
     public function testItCanDropCache()
     {
-        $cache = $this->getCacheDriver();
-        $cache->set('cached.value.key', 1, 1);
-        $cache->drop();
+        $this->cache->set('cached.value.key', 1, 1);
+        $this->cache->drop();
 
-        $this->assertEquals(null, $cache->get('cached.value.key'));
-        $this->assertFalse($cache->isHit());
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
     }
 
     public function testItIsAvailable()
     {
-        $cache = $this->getCacheDriver();
-        $this->assertTrue($cache->isAvailable());
+        $this->assertTrue($this->cache->isAvailable());
+    }
+
+
+    public function testItCanCacheAnObject()
+    {
+        $data = new DateTime('now');
+
+        $this->cache->set('cached.value.key', $data, 1);
+
+        $this->assertEquals($data, $this->cache->get('cached.value.key'));
+        $this->assertFalse($data === $this->cache->get('cached.value.key'));
+    }
+
+    public function testItCanCacheAnArray()
+    {
+        $data = [new DateTime('now')];
+
+        $this->cache->set('cached.value.key', $data, 1);
+        $this->assertEquals($data, $this->cache->get('cached.value.key'));
     }
 }

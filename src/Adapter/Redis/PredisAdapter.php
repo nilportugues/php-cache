@@ -75,8 +75,9 @@ class PredisAdapter extends Adapter implements CacheAdapter
             $value = $this->redis->get($key);
             if ($value) {
                 $this->hit = true;
+                $value = $this->restoreDataStructure($value);
                 $this->inMemoryAdapter->set($key, $value);
-                return $this->restoreDataStructure($value);
+                return $value;
             }
         }
 
@@ -91,16 +92,6 @@ class PredisAdapter extends Adapter implements CacheAdapter
     public function isAvailable()
     {
         return $this->connected && $this->redis->isConnected();
-    }
-
-    /**
-     * @param $value
-     *
-     * @return mixed
-     */
-    private function restoreDataStructure($value)
-    {
-        return unserialize($value);
     }
 
     /**
@@ -132,16 +123,6 @@ class PredisAdapter extends Adapter implements CacheAdapter
         }
 
         return $this;
-    }
-
-    /**
-     * @param $value
-     *
-     * @return string
-     */
-    private function storageDataStructure($value)
-    {
-        return serialize($value);
     }
 
     /**

@@ -34,13 +34,42 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
         if (array_key_exists($key, $this->registry)) {
             if ($this->registry[$key]['expires'] >= (new DateTime())) {
                 $this->hit = true;
-                $value     = $this->registry[$key]['value'];
-            } else {
-                unset($this->registry[$key]);
+                return $this->restoreDataStructure($key);
             }
+            unset($this->registry[$key]);
         }
 
-        return (is_object($value)) ? clone $value : $value;
+        return $value;
+    }
+
+    /**
+     * @param $key
+     *
+     * @return mixed
+     */
+    protected function restoreDataStructure($key)
+    {
+        if ($this->isSerializedArray($key)) {
+            return unserialize($this->registry[$key]['value']);
+        }
+
+        return (is_object($this->registry[$key]['value'])) ?
+            clone $this->registry[$key]['value'] :
+            $this->registry[$key]['value'];
+    }
+
+    /**
+     * @param $key
+     *
+     * @return bool
+     */
+    private function isSerializedArray($key)
+    {
+        return is_string($this->registry[$key]['value'])
+        && 'a:' === substr($this->registry[$key]['value'], 0, 2)
+        && '}' === substr($this->registry[$key]['value'], -1)
+        && (':{i:' === substr($this->registry[$key]['value'], 3, 4)
+            || ':{s:' === substr($this->registry[$key]['value'], 3, 4));
     }
 
     /**
@@ -54,7 +83,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     public function set($key, $value, $ttl = 0)
     {
-        $key = (string) $key;
+        $key = (string)$key;
         $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
@@ -64,11 +93,25 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
             }
 
             $this->registry[$key] = [
-                'value'   => (is_object($value)) ? clone $value : $value,
+                'value'   => $this->storageDataStructure($value),
                 'expires' => new DateTime(date('Y-m-d H:i:s', $calculatedTtl))
             ];
         }
         return $this;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return mixed
+     */
+    protected function storageDataStructure($value)
+    {
+        if (is_array($value)) {
+            return serialize($value);
+        }
+
+        return (is_object($value)) ? clone $value : $value;
     }
 
     /**
