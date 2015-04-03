@@ -2,50 +2,50 @@
 
 namespace NilPortugues\Cache\Adapter\Redis;
 
+use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\CacheAdapter;
-use NilPortugues\Cache\Adapter\Adapter;
+use Redis;
+use RedisException;
 
 /**
  * Class NativeAdapter
  * @package NilPortugues\Cache\Adapter\Redis
  */
-class NativeAdapter extends Adapter implements CacheAdapter
+class NativeAdapter extends AbstractAdapter
 {
     /**
-     * Get a value identified by $key.
+     * @param array           $connections
+     * @param InMemoryAdapter $inMemory
+     * @param CacheAdapter    $next
      *
-     * @param  string $key
-     *
-     * @return bool|mixed
+     * @throws \Exception
      */
-    public function get($key)
+    public function __construct(array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
-        // TODO: Implement get() method.
+        if (false === class_exists('\Redis')) {
+            throw new \Exception(
+                sprintf(
+                    'Redis extension for PHP is not installed on the system, use %s class instead.',
+                    PredisAdapter::class
+                )
+            );
+        }
+
+        try {
+            $connections = array_values($connections);
+
+            $this->redis = new Redis();
+            $this->redis->connect($connections[0]['host'], $connections[0]['port']);
+            $this->redis->select($connections[0]['database']);
+            $this->connected = true;
+        } catch (RedisException $e) {
+            $this->connected = false;
+        }
+
+        $this->inMemoryAdapter = $inMemory;
+        $this->nextAdapter     = $next;
     }
 
-    /**
-     * Set a value identified by $key and with an optional $ttl.
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $ttl
-     *
-     * @return $this
-     */
-    public function set($key, $value, $ttl = 0)
-    {
-        // TODO: Implement set() method.
-    }
-
-    /**
-     * Delete a value identified by $key.
-     *
-     * @param  string $key
-     */
-    public function delete($key)
-    {
-        // TODO: Implement delete() method.
-    }
 
     /**
      * Checks the availability of the cache service.
@@ -54,26 +54,13 @@ class NativeAdapter extends Adapter implements CacheAdapter
      */
     public function isAvailable()
     {
-        // TODO: Implement isAvailable() method.
-    }
+        $available = true;
+        try {
+            $this->redis->ping();
+        } catch (RedisException $e) {
+            $available = false;
+        }
 
-    /**
-     * Clears all expired values from cache.
-     *
-     * @return mixed
-     */
-    public function clear()
-    {
-        // TODO: Implement clear() method.
-    }
-
-    /**
-     * Clears all values from the cache.
-     *
-     * @return mixed
-     */
-    public function drop()
-    {
-        // TODO: Implement drop() method.
+        return $available;
     }
 }

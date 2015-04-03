@@ -11,12 +11,10 @@ use NilPortugues\Cache\CacheAdapter;
  */
 class InMemoryAdapter extends Adapter implements CacheAdapter
 {
-
     /**
      * @var array
      */
     private $registry = [];
-
 
     /**
      * Get a value identified by $key.
@@ -43,7 +41,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
      * @return mixed
      */
@@ -87,10 +85,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
         $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
-            $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
-            if (0 == $ttl) {
-                $calculatedTtl = strtotime('now +10 years');
-            }
+            $calculatedTtl = $this->getCalculatedTtl($ttl);
 
             $this->registry[$key] = [
                 'value'   => $this->storageDataStructure($value),
@@ -98,6 +93,20 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
             ];
         }
         return $this;
+    }
+
+    /**
+     * @param $ttl
+     *
+     * @return int
+     */
+    private function getCalculatedTtl($ttl)
+    {
+        $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
+        if (0 == $ttl) {
+            $calculatedTtl = strtotime('now +10 years');
+        }
+        return $calculatedTtl;
     }
 
     /**
