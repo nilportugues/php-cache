@@ -114,17 +114,11 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function getDirectoryHash($key)
     {
+        $key = md5($key);
+
         $level1 = substr($key, 0, 1);
-
-        $level2 = $level1;
-        if (true === strlen($key) > 1) {
-            $level2 = substr($key, 1, 1);
-        }
-
-        $level3 = $level1;
-        if (true === strlen($key) > 2) {
-            $level3 = substr($key, 2, 1);
-        }
+        $level2 = substr($key, 1, 1);
+        $level3 = substr($key, 2, 1);
 
         $directoryHash = $level1 . DIRECTORY_SEPARATOR . $level2 . DIRECTORY_SEPARATOR . $level3;
         $this->createCacheHashDirectory($directoryHash);
