@@ -50,18 +50,9 @@ $parameters = [
 //Array acting as a Service Container
 $services = [];
 
-$services['cache.adapter.in_memory_adapter'] = new InMemoryAdapter();
-
-$services['cache.adapter.redis.predis_adapter'] = new PredisAdapter(
-    $parameters['redis_servers'],
-    $services['cache.adapter.in_memory_adapter']
-);
-
-$services['cache'] = new Cache(
-    $services['cache.adapter.redis.predis_adapter'],
-    'namespaced.cache'
-);
-
+$services['in_memory_adapter'] = new InMemoryAdapter();
+$services['redis.predis_adapter'] = new PredisAdapter($parameters['redis_servers'], $services['in_memory_adapter']);
+$services['cache'] = new Cache($services['redis.predis_adapter'], 'namespaced.cache');
 
 return $services;
 ```
