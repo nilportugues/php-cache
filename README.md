@@ -24,15 +24,11 @@ php composer.phar require nilportugues/cache
 
 ### 3. Use case
 
-Lets imagine we decided to use Redis as our main cache, being a dedicated server. This is our main cache.
+- **1st level cache**: Redis (PredisAdapter) is our main cache, in a dedicated server.
+- **2nd level cache**: Memcached (MemcachedAdapter) as fallback mechanism, available in the same machine as our PHP script.
+- **Application cache**: InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers.
 
-As a fallback mechanism, lets suppose we decided to use Memcached, which is available to us in the same machine as our PHP script. 
-
-Finally, an application level cache, the InMemoryAdapter is used to avoid hiting the external caches on repeated operations.
-
-- **1st level cache**: Redis (PredisAdapter)
-- **2nd level cache**: Memcached (MemcachedAdapter)
-- **Application cache**: InMemoryAdapter
+The more cache levels the slower the cache system will be, so leverage the cache to your needs. Maybe you don't need a fallback mechanism at all!
 
 #### 3.1. Configuration 
 
