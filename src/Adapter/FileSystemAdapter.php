@@ -78,7 +78,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
                 return $value['value'];
             }
 
-            unlink($fileKey);
+            $this->removeCacheFile($fileKey);
         }
 
         return (null !== $this->nextAdapter) ? $this->nextAdapter->get($key) : null;
@@ -136,6 +136,24 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     }
 
     /**
+     * @param $fileKey
+     *
+     * @throws \RuntimeException
+     */
+    private function removeCacheFile($fileKey)
+    {
+        if (false === unlink($fileKey)) {
+            $pathParts = explode(DIRECTORY_SEPARATOR, $fileKey);
+            $key       = array_pop($pathParts);
+            $key       = substr($key, 0, -strlen(self::CACHE_FILE_SUFFIX));
+
+            throw new RuntimeException(
+                sprintf('Could not remove from the file system cache the value with key: %s', $key)
+            );
+        }
+    }
+
+    /**
      * Set a value identified by $key and with an optional $ttl.
      *
      * @param string $key
@@ -155,7 +173,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
 
             if (false === file_put_contents($this->getFilenameFromCacheKey($key), $data)) {
                 throw new RuntimeException(
-                    sprintf('Could not persist to file system cache the value associated with key: %s', $key)
+                    sprintf('Could not persist to file system cache the value with key: %s', $key)
                 );
             }
 
@@ -212,9 +230,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         $fileKey = $this->getFilenameFromCacheKey($key);
 
         if (true === file_exists($fileKey)) {
-            if (false === unlink($fileKey)) {
-                throw new RuntimeException(sprintf('Could not remove from cache key %s', $key));
-            }
+            $this->removeCacheFile($fileKey);
         }
 
         $this->inMemoryAdapter->delete($key);
@@ -260,7 +276,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             } else {
                 $value = $this->restoreDataStructure(file_get_contents($file));
                 if ($value['expires'] < (new DateTime())) {
-                    unlink($file);
+                    $this->removeCacheFile($file);
                 }
             }
         }
@@ -290,7 +306,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             if (is_dir($file)) {
                 $this->removeCacheFiles($file);
             } else {
-                unlink($file);
+                $this->removeCacheFile($file);
             }
         }
     }
