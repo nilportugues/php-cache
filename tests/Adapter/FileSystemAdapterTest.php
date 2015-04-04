@@ -53,6 +53,35 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
         $this->cache = null;
     }
 
+    public function testItThrowsExceptionWhenCacheDirDoesNotExist()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        $this->inMemoryAdapter = new InMemoryAdapter();
+        $nextAdapter = new InMemoryAdapter();
+
+        new FileSystemAdapter('./a', $this->inMemoryAdapter, $nextAdapter);
+    }
+
+
+    public function testItThrowsExceptionWhenCacheDirIsNotADirectory()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        $this->inMemoryAdapter = new InMemoryAdapter();
+        $nextAdapter = new InMemoryAdapter();
+
+        new FileSystemAdapter(__FILE__, $this->inMemoryAdapter, $nextAdapter);
+    }
+
+
+    public function testItThrowsExceptionWhenCacheDirIsNotWritable()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        $this->inMemoryAdapter = new InMemoryAdapter();
+        $nextAdapter = new InMemoryAdapter();
+
+        new FileSystemAdapter('/', $this->inMemoryAdapter, $nextAdapter);
+    }
+
     public function testItCanGetAndReturnsNull()
     {
         $this->cache->set('cached.value.key', 1, -1);
