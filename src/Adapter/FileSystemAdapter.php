@@ -3,8 +3,8 @@
 namespace NilPortugues\Cache\Adapter;
 
 use DateTime;
+use InvalidArgumentException;
 use NilPortugues\Cache\CacheAdapter;
-use RuntimeException;
 
 /**
  * Class FileSystemAdapter
@@ -33,6 +33,8 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      * @param string          $cacheDir
      * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($cacheDir, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
@@ -42,9 +44,15 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         $cacheDir = realpath($cacheDir);
 
         if (false === is_dir($cacheDir)) {
+            throw new InvalidArgumentException(
+                sprintf('The provided path %s is not a valid directory', $cacheDir)
+            );
         }
 
         if (false === is_writable($cacheDir)) {
+            throw new InvalidArgumentException(
+                sprintf('The provided directory %s is not writable', $cacheDir)
+            );
         }
 
         $this->cacheDir = $cacheDir;
@@ -142,15 +150,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function removeCacheFile($fileKey)
     {
-        if (false === unlink($fileKey)) {
-            $pathParts = explode(DIRECTORY_SEPARATOR, $fileKey);
-            $key       = array_pop($pathParts);
-            $key       = substr($key, 0, -strlen(self::CACHE_FILE_SUFFIX));
-
-            throw new RuntimeException(
-                sprintf('Could not remove from the file system cache the value with key: %s', $key)
-            );
-        }
+        unlink($fileKey);
     }
 
     /**
@@ -160,7 +160,6 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      * @param mixed  $value
      * @param int    $ttl
      *
-     * @throws RuntimeException
      * @return $this
      */
     public function set($key, $value, $ttl = 0)
@@ -170,12 +169,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         if ($ttl >= 0) {
             $calculatedTtl = $this->getCalculatedTtl($ttl);
             $data          = $this->buildDataCache($value, $calculatedTtl);
-
-            if (false === file_put_contents($this->getFilenameFromCacheKey($key), $data)) {
-                throw new RuntimeException(
-                    sprintf('Could not persist to file system cache the value with key: %s', $key)
-                );
-            }
+            file_put_contents($this->getFilenameFromCacheKey($key), $data);
 
             $this->inMemoryAdapter->set($key, $value, $ttl);
 

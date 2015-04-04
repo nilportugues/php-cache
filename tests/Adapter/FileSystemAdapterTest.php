@@ -47,10 +47,11 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $directory = realpath(dirname(__FILE__)).'/tmp';
 
-        $this->removeDirectory($directory);
+        if (true === file_exists($directory)) {
+            $this->removeDirectory($directory);
+        }
         $this->cache = null;
     }
-
 
     public function testItCanGetAndReturnsNull()
     {
@@ -135,9 +136,6 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->cache->isAvailable());
     }
 
-    /**
-     * @param $directory
-     */
     private function removeDirectory($directory)
     {
         foreach (glob("{$directory}/*") as $file) {
