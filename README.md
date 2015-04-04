@@ -41,7 +41,7 @@ use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
 use NilPortugues\Cache\Cache;
 
-$parameters = [
+$params = [
   'redis_servers' => [
       ['host' =>'127.0.0.1', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1'],
   ],
@@ -51,8 +51,8 @@ $parameters = [
 $services = [];
 
 $services['in_memory_adapter'] = new InMemoryAdapter();
-$services['redis.predis_adapter'] = new PredisAdapter($parameters['redis_servers'], $services['in_memory_adapter']);
-$services['cache'] = new Cache($services['redis.predis_adapter'], 'namespaced.cache');
+$services['predis_adapter'] = new PredisAdapter($params['redis_servers'], $services['in_memory_adapter']);
+$services['cache'] = new Cache($services['predis_adapter'], 'namespaced.cache');
 
 return $services;
 ```
