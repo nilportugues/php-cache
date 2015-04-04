@@ -14,7 +14,6 @@ namespace NilPortugues\Tests\Cache\Adapter\Redis;
  * Class NativeAdapterTest
  * @package NilPortugues\Tests\Cache\Adapter\Redis
  */
-class NativeAdapterTest extends \PHPUnit_Framework_TestCase {
-
+class NativeAdapterTest extends \PHPUnit_Framework_TestCase
+{
 }
- 

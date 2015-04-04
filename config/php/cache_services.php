@@ -4,7 +4,7 @@ use NilPortugues\Cache\Adapter\Redis\NativeAdapter;
 use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
 use NilPortugues\Cache\Cache;
 
-$parameters = include realpath(dirname(__FILE__)).'cache_parameters.php';
+$parameters = include realpath(dirname(__FILE__)).'/cache_parameters.php';
 
 $inMemoryAdapter = new InMemoryAdapter();
 $nativeRedisAdapter = new NativeAdapter($parameters['redis_servers'], $inMemoryAdapter);

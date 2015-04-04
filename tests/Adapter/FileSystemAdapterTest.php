@@ -10,12 +10,143 @@
 
 namespace NilPortugues\Tests\Cache\Adapter;
 
+use NilPortugues\Cache\Adapter\FileSystemAdapter;
+use NilPortugues\Cache\Adapter\InMemoryAdapter;
+
 /**
  * Class FileSystemAdapterTest
  * @package NilPortugues\Tests\Cache\Adapter
  */
 class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var FileSystemAdapter
+     */
+    private $cache;
 
+    /**
+     * @var InMemoryAdapter
+     */
+    private $inMemoryAdapter;
+
+    public function setUp()
+    {
+        $cacheDir = realpath(dirname(__FILE__)).'/tmp';
+        if (file_exists($cacheDir)) {
+            $this->removeDirectory($cacheDir);
+        }
+        mkdir($cacheDir);
+
+        $this->inMemoryAdapter = new InMemoryAdapter();
+        $nextAdapter = new InMemoryAdapter();
+
+        $this->cache = new FileSystemAdapter($cacheDir, $this->inMemoryAdapter, $nextAdapter);
+    }
+
+    public function tearDown()
+    {
+        $directory = realpath(dirname(__FILE__)).'/tmp';
+
+        $this->removeDirectory($directory);
+        $this->cache = null;
+    }
+
+
+    public function testItCanGetAndReturnsNull()
+    {
+        $this->cache->set('cached.value.key', 1, -1);
+
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
+    }
+
+    public function testItCanGetAndReturnsValueWithoutTtl()
+    {
+        $this->cache->set('cached.value.key', 1);
+
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
+    }
+
+    public function testItCanGetAndReturnsValueFromMemoryWithTtl()
+    {
+        $this->cache->set('cached.value.key', 1, 1000);
+
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
+    }
+
+    public function testItCanGetAndReturnsValueFromFileSystemWithTtl()
+    {
+        $this->cache->set('cached.value.key', 1, 1000);
+        $this->inMemoryAdapter->drop();
+
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
+    }
+
+    public function testItCanGetAndReturnsValueFromFileSystemAndWillExpire()
+    {
+        $this->cache->set('cached.value.key', 1, 1);
+        $this->inMemoryAdapter->drop();
+
+        sleep(2); //Not a bug, Wait for 2 seconds.
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
+    }
+
+    public function testItCanGetDeleteAValue()
+    {
+        $this->cache->set('cached.value.key', 1);
+
+        $this->assertEquals(1, $this->cache->get('cached.value.key'));
+        $this->assertTrue($this->cache->isHit());
+
+        $this->cache->delete('cached.value.key');
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
+    }
+
+    public function testItCanClearValues()
+    {
+        $this->cache->set('cached.value.key1', 1, 1);
+        $this->cache->set('cached.value.key2', 2, 1);
+
+        $this->assertEquals(1, $this->cache->get('cached.value.key1'));
+        $this->assertEquals(2, $this->cache->get('cached.value.key2'));
+
+        sleep(2); //Not a bug, Wait for 2 seconds.
+        $this->cache->clear();
+        $this->assertEquals(null, $this->cache->get('cached.value.key1'));
+        $this->assertEquals(null, $this->cache->get('cached.value.key2'));
+    }
+
+    public function testItCanDropCache()
+    {
+        $this->cache->set('cached.value.key', 1, 1);
+        $this->cache->drop();
+
+        $this->assertEquals(null, $this->cache->get('cached.value.key'));
+        $this->assertFalse($this->cache->isHit());
+    }
+
+    public function testItIsAvailable()
+    {
+        $this->assertTrue($this->cache->isAvailable());
+    }
+
+    /**
+     * @param $directory
+     */
+    private function removeDirectory($directory)
+    {
+        foreach (glob("{$directory}/*") as $file) {
+            if (is_dir($file)) {
+                $this->removeDirectory($file);
+            } else {
+                unlink($file);
+            }
+        }
+        rmdir($directory);
+    }
 }
- 

@@ -20,7 +20,7 @@ class PredisAdapter extends AbstractAdapter
     public function __construct(array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
         $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = $next;
+        $this->nextAdapter     = ($inMemory === $next) ? null: $next;
 
         try {
             $this->redis = new Client($connections);

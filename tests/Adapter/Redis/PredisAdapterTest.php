@@ -16,6 +16,4 @@ namespace NilPortugues\Tests\Cache\Adapter\Redis;
  */
 class PredisAdapterTest extends \PHPUnit_Framework_TestCase
 {
-
 }
- 

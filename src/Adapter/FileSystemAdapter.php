@@ -4,6 +4,7 @@ namespace NilPortugues\Cache\Adapter;
 
 use DateTime;
 use NilPortugues\Cache\CacheAdapter;
+use RuntimeException;
 
 /**
  * Class FileSystemAdapter
@@ -11,7 +12,6 @@ use NilPortugues\Cache\CacheAdapter;
  */
 class FileSystemAdapter extends Adapter implements CacheAdapter
 {
-    const CACHE_FILE_PREFIX = '__';
     const CACHE_FILE_SUFFIX = '.php.cache';
 
     /**
@@ -37,7 +37,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     public function __construct($cacheDir, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
         $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = $next;
+        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
 
         $cacheDir = realpath($cacheDir);
 
@@ -59,7 +59,9 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     public function get($key)
     {
-        $key = (string)$key;
+        $key       = (string)$key;
+        $value     = null;
+        $this->hit = false;
 
         $inMemoryValue = $this->inMemoryAdapter->get($key);
         if ($this->inMemoryAdapter->isHit()) {
@@ -68,6 +70,18 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         }
 
         $fileKey = $this->getFilenameFromCacheKey($key);
+
+        if (true === file_exists($fileKey)) {
+            $value = $this->restoreDataStructure(file_get_contents($fileKey));
+            if ($value['expires'] >= (new DateTime())) {
+                $this->hit = true;
+                return $value['value'];
+            }
+
+            unlink($fileKey);
+        }
+
+        return (null !== $this->nextAdapter) ? $this->nextAdapter->get($key) : null;
     }
 
     /**
@@ -77,7 +91,48 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function getFilenameFromCacheKey($key)
     {
-        return $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_FILE_PREFIX . $key . self::CACHE_FILE_SUFFIX;
+        return $this->cacheDir
+        . DIRECTORY_SEPARATOR
+        . $this->getDirectoryHash($key)
+        . DIRECTORY_SEPARATOR
+        . $key
+        . self::CACHE_FILE_SUFFIX;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    private function getDirectoryHash($key)
+    {
+        $level1 = substr($key, 0, 1);
+
+        $level2 = $level1;
+        if (true === strlen($key) > 1) {
+            $level2 = substr($key, 1, 1);
+        }
+
+        $level3 = $level1;
+        if (true === strlen($key) > 2) {
+            $level3 = substr($key, 2, 1);
+        }
+
+        $directoryHash = $level1 . DIRECTORY_SEPARATOR . $level2 . DIRECTORY_SEPARATOR . $level3;
+        $this->createCacheHashDirectory($directoryHash);
+
+        return $directoryHash;
+    }
+
+    /**
+     * @param $directoryHash
+     */
+    private function createCacheHashDirectory($directoryHash)
+    {
+        $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . $directoryHash;
+        if (false === file_exists($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
     }
 
     /**
@@ -87,7 +142,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      * @param mixed  $value
      * @param int    $ttl
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return $this
      */
     public function set($key, $value, $ttl = 0)
@@ -99,7 +154,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             $data          = $this->buildDataCache($value, $calculatedTtl);
 
             if (false === file_put_contents($this->getFilenameFromCacheKey($key), $data)) {
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     sprintf('Could not persist to file system cache the value associated with key: %s', $key)
                 );
             }
@@ -149,10 +204,24 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      * Delete a value identified by $key.
      *
      * @param  string $key
+     *
+     * @throws \RuntimeException
      */
     public function delete($key)
     {
+        $fileKey = $this->getFilenameFromCacheKey($key);
+
+        if (true === file_exists($fileKey)) {
+            if (false === unlink($fileKey)) {
+                throw new RuntimeException(sprintf('Could not remove from cache key %s', $key));
+            }
+        }
+
         $this->inMemoryAdapter->delete($key);
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->delete($key);
+        }
     }
 
     /**
@@ -172,7 +241,29 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
+        $this->clearCacheFiles($this->cacheDir);
         $this->inMemoryAdapter->clear();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->clear();
+        }
+    }
+
+    /**
+     * @param string $directory
+     */
+    private function clearCacheFiles($directory)
+    {
+        foreach (glob("{$directory}/*") as $file) {
+            if (is_dir($file)) {
+                $this->clearCacheFiles($file);
+            } else {
+                $value = $this->restoreDataStructure(file_get_contents($file));
+                if ($value['expires'] < (new DateTime())) {
+                    unlink($file);
+                }
+            }
+        }
     }
 
     /**
@@ -182,6 +273,25 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     public function drop()
     {
+        $this->removeCacheFiles($this->cacheDir);
         $this->inMemoryAdapter->drop();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->drop();
+        }
+    }
+
+    /**
+     * @param string $directory
+     */
+    private function removeCacheFiles($directory)
+    {
+        foreach (glob("{$directory}/*") as $file) {
+            if (is_dir($file)) {
+                $this->removeCacheFiles($file);
+            } else {
+                unlink($file);
+            }
+        }
     }
 }
