@@ -24,13 +24,43 @@ php composer.phar require nilportugues/cache
 
 ### 3. Use case
 
-- **1st level cache**: Redis (PredisAdapter) is our main cache, in a dedicated server.
-- **2nd level cache**: Memcached (MemcachedAdapter) as fallback mechanism, available in the same machine as our PHP script.
-- **Application cache**: InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers.
+Lets imagine we decided to use Redis as our main cache, being a dedicated server. This is our main cache.
 
-The more cache levels the slower the cache system will be, so leverage the cache to your needs. Maybe you don't need a fallback mechanism at all!
+As a fallback mechanism, lets suppose we decided to use Memcached, which is available to us in the same machine as our PHP script. 
 
-#### 3.1. Configuration 
+Finally, an application level cache, the InMemoryAdapter is used to avoid hiting the external caches on repeated operations.
+
+- 1st level cache: Redis (PredisAdapter)
+- 2nd level cache: Memcached (MemcachedAdapter)
+- Application cache: InMemoryAdapter
+
+#### 3.1. Configuration
+
+Using a Service Container, such as Symfony2's or a simple array of services, define the chain:
+
+```php
+<?php
+use NilPortugues\Cache\Adapter\InMemoryAdapter;
+use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
+use NilPortugues\Cache\Cache;
+
+$parameters = [
+  'redis_servers' => [
+      ['host' =>'127.0.0.1', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1'],
+  ],
+];
+
+$inMemoryAdapter = new InMemoryAdapter();
+$predisRedisAdapter = new PredisAdapter($parameters['redis_servers'], $inMemoryAdapter);
+
+//Array acting as a Service container
+return [
+    'cache.adapter.in_memory_adapter' => $inMemoryAdapter,
+    'cache.adapter.redis.predis_adapter' => $predisRedisAdapter,
+    'cache' => new Cache($predisRedisAdapter, 'namespaced.cache'),
+];
+
+```
 
 #### 3.2. Usage
 
