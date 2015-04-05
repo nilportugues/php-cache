@@ -78,6 +78,8 @@ abstract class AbstractPDOConnection
         try {
             $dsn = $this->buildDSNString($parameters[self::DATABASE]);
             $this->connection = new PDO($this->dsn.$dsn, $username, $password, $driverOptions);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         } catch (PDOException $e) {
             throw new InvalidArgumentException(
                 sprintf("An exception occurred in %s: %s", get_class($this), $e->getMessage())
