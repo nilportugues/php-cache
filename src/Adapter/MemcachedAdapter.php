@@ -27,6 +27,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;
 
+        $connections     = array_values($connections);
         $connections     = array_unique($connections);
         $this->memcached = new Memcached($persistentId);
         $this->memcached->addServers($connections);
@@ -85,7 +86,11 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
         $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
-            $this->memcached->set($key, $value, time() + $ttl);
+            $this->memcached->set($key, $value);
+
+            if ($ttl>0) {
+                $this->memcached->touch($key, time() + $ttl);
+            }
 
             $this->inMemoryAdapter->set($key, $value, $ttl);
             if (null !== $this->nextAdapter) {

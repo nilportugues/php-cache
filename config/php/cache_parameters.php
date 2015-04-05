@@ -10,15 +10,25 @@ return [
             'timeout'  => 1
         ],
     ],
-    'mysql_connection' => [
+    'mysql_servers' => [
         'cache_table' => '__cache',
-        'master' => [
+        'connections' => [
             'user'     => 'root',
             'password' => '',
             'database' => [
                 'dbname' => 'my_database',
                 'host'   => 'localhost',
                 'port'   => 3306,
+            ],
+        ],
+    ],
+    'memcached_servers' => [
+        'persistent_id' => '__cache',
+        'connections' => [
+            'server1' => [
+                'host' => '127.0.0.1',
+                'port' => 11211,
+                'weight' => 1
             ],
         ],
     ]

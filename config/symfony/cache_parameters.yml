@@ -2,15 +2,15 @@ parameters:
 
   mysql_connection:
     cache_table: '__cache'
-    master: 
-      database: 
+    master:
+      database:
         dbname: my_database
         host: localhost
         port: 3306
       password: dbpassword
       user: dbuser
 
-  redis_servers: 
+  redis_servers:
     cache1:
       alias: cache1
       database: 1

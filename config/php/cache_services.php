@@ -2,6 +2,7 @@
 include_once realpath(dirname(__FILE__)).'/../../vendor/autoload.php';
 
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
+use NilPortugues\Cache\Adapter\MemcachedAdapter;
 use NilPortugues\Cache\Adapter\Redis\NativeAdapter;
 use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
 use NilPortugues\Cache\Adapter\SQL\MySqlAdapter;
@@ -22,13 +23,20 @@ $predisRedisAdapter = new PredisAdapter(
 );
 
 $mysqlAdapter = new MySqlAdapter(
-    $parameters['mysql_connection']['master'],
-    $parameters['mysql_connection']['cache_table'],
+    $parameters['mysql_servers']['connections'],
+    $parameters['mysql_servers']['cache_table'],
+    $inMemoryAdapter
+);
+
+$memcachedAdapter = new MemcachedAdapter(
+    $parameters['memcached_servers']['persistent_id'],
+    $parameters['memcached_servers']['connections'],
     $inMemoryAdapter
 );
 
 return [
     'nil_portugues.cache.adapter.in_memory_adapter' => $inMemoryAdapter,
+    'nil_portugues.cache.adapter.memcached_adapter' => $memcachedAdapter,
     'nil_portugues.cache.adapter.sql.mysql_adapter' => $mysqlAdapter,
     'nil_portugues.cache.adapter.redis.native_adapter' => $nativeRedisAdapter,
     'nil_portugues.cache.adapter.redis.predis_adapter' => $predisRedisAdapter,
