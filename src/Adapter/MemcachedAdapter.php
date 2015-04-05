@@ -134,9 +134,6 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
-        $keys = $this->memcached->getAllKeys();
-        $this->memcached->deleteMulti(is_array($keys) ? $keys : [], time());
-
         $this->inMemoryAdapter->clear();
 
         if (null !== $this->nextAdapter) {
