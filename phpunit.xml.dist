@@ -28,12 +28,16 @@
     <testsuites>
         <testsuite name="Test Suite">
             <directory>./tests</directory>
+
         </testsuite>
     </testsuites>
 
     <filter>
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="false">
             <directory>./src</directory>
+            <exclude>
+                <directory suffix=".php">./src/Adapter/SQL/Connection</directory>
+            </exclude>
         </whitelist>
     </filter>
 

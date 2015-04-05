@@ -10,7 +10,6 @@
 
 namespace NilPortugues\Tests\Cache\Adapter\Redis;
 
-
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
 
 /**
@@ -114,6 +113,4 @@ class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $this->cache->get('cached.value.key'));
         $this->assertFalse($this->cache->isHit());
     }
-
 }
- 

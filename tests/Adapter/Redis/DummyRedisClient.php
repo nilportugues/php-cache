@@ -12,7 +12,6 @@ namespace NilPortugues\Tests\Cache\Adapter\Redis;
 
 use DateTime;
 
-
 /**
  * Class DummyRedisClient
  * @package NilPortugues\Tests\Cache\Adapter\Redis
@@ -95,4 +94,4 @@ class DummyRedisClient
     {
         $this->redis = [];
     }
-} 
+}

@@ -14,7 +14,6 @@ use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\Adapter\Redis\AbstractAdapter;
 use NilPortugues\Cache\CacheAdapter;
 
-
 /**
  * Class DummyAdapter
  * @package NilPortugues\Tests\Cache\Adapter\Redis
@@ -42,4 +41,4 @@ class DummyAdapter extends AbstractAdapter
     {
         return true;
     }
-} 
+}

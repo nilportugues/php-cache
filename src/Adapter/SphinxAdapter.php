@@ -2,77 +2,22 @@
 
 namespace NilPortugues\Cache\Adapter;
 
-use NilPortugues\Cache\CacheAdapter;
+use NilPortugues\Cache\Adapter\SQL\AbstractAdapter;
+use NilPortugues\Cache\Adapter\SQL\Connection\SphinxPDOConnection;
 
 /**
  * Class SphinxAdapter
  * @package NilPortugues\Cache\Adapter
  */
-class SphinxAdapter extends Adapter implements CacheAdapter
+class SphinxAdapter extends AbstractAdapter
 {
     /**
-     * Get a value identified by $key.
-     *
-     * @param  string $key
-     *
-     * @return bool|mixed
+     * @var string
      */
-    public function get($key)
-    {
-        // TODO: Implement get() method.
-    }
+    protected $connectionClass = SphinxPDOConnection::class;
 
     /**
-     * Set a value identified by $key and with an optional $ttl.
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $ttl
-     *
-     * @return $this
+     * @var array
      */
-    public function set($key, $value, $ttl = 0)
-    {
-        // TODO: Implement set() method.
-    }
-
-    /**
-     * Delete a value identified by $key.
-     *
-     * @param  string $key
-     */
-    public function delete($key)
-    {
-        // TODO: Implement delete() method.
-    }
-
-    /**
-     * Checks the availability of the cache service.
-     *
-     * @return bool
-     */
-    public function isAvailable()
-    {
-        // TODO: Implement isAvailable() method.
-    }
-
-    /**
-     * Clears all expired values from cache.
-     *
-     * @return mixed
-     */
-    public function clear()
-    {
-        // TODO: Implement clear() method.
-    }
-
-    /**
-     * Clears all values from the cache.
-     *
-     * @return mixed
-     */
-    public function drop()
-    {
-        // TODO: Implement drop() method.
-    }
+    protected $requiredKeys = [];
 }
