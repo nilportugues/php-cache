@@ -17,7 +17,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     private $memcached;
 
     /**
-     * @param string $persistentId
+     * @param string          $persistentId
      * @param array           $connections
      * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
@@ -25,13 +25,14 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     public function __construct($persistentId, array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
         $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = ($inMemory === $next) ? null: $next;
+        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
 
-        $connections = array_unique($connections);
+        $connections     = array_unique($connections);
         $this->memcached = new Memcached($persistentId);
         $this->memcached->addServers($connections);
 
-        $this->memcached->setOption(Memcached::OPT_SERIALIZER,
+        $this->memcached->setOption(
+            Memcached::OPT_SERIALIZER,
             ($this->memcached->getOption(Memcached::HAVE_IGBINARY))
                 ? Memcached::SERIALIZER_IGBINARY : Memcached::SERIALIZER_PHP
         );
@@ -46,11 +47,28 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      *
      * @param  string $key
      *
-     * @return bool|mixed
+     * @return mixed
      */
     public function get($key)
     {
-        // TODO: Implement get() method.
+        $this->hit = false;
+
+        $inMemoryValue = $this->inMemoryAdapter->get($key);
+
+        if ($this->inMemoryAdapter->isHit()) {
+            $this->hit = true;
+            return $inMemoryValue;
+        }
+
+        $value = $this->memcached->get($key);
+
+        if ($value) {
+            $this->hit = true;
+            $this->inMemoryAdapter->set($key, $value, 0);
+            return $value;
+        }
+
+        return (null !== $this->nextAdapter) ? $this->nextAdapter->get($key) : null;
     }
 
     /**
@@ -64,7 +82,18 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function set($key, $value, $ttl = 0)
     {
-        // TODO: Implement set() method.
+        $ttl = $this->fromDefaultTtl($ttl);
+
+        if ($ttl >= 0) {
+            $this->memcached->set($key, $value, time() + $ttl);
+
+            $this->inMemoryAdapter->set($key, $value, $ttl);
+            if (null !== $this->nextAdapter) {
+                $this->nextAdapter->set($key, $value, $ttl);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -74,7 +103,12 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function delete($key)
     {
-        // TODO: Implement delete() method.
+        $this->memcached->delete($key);
+        $this->inMemoryAdapter->delete($key);
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->delete($key);
+        }
     }
 
     /**
@@ -95,7 +129,14 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
-        // TODO: Implement clear() method.
+        $keys = $this->memcached->getAllKeys();
+        $this->memcached->deleteMulti(is_array($keys) ? $keys : [], time());
+
+        $this->inMemoryAdapter->clear();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->clear();
+        }
     }
 
     /**
@@ -105,6 +146,11 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function drop()
     {
-        // TODO: Implement drop() method.
+        $this->memcached->flush();
+        $this->inMemoryAdapter->drop();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->drop();
+        }
     }
 }
