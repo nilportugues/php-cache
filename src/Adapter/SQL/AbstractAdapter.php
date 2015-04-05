@@ -160,7 +160,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     {
         try {
             $stmt = $this->connection->prepare(
-                sprintf('SELECT cache_value FROM %s WHERE cache_id = :id', $this->cacheTableName)
+                sprintf('SELECT cache_value, cache_ttl FROM %s WHERE cache_id = :id', $this->cacheTableName)
             );
 
             $stmt->bindParam(':id', $key, PDO::PARAM_STR);
