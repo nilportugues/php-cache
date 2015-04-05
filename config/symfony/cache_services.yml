@@ -4,7 +4,13 @@ imports:
 services:
     nil_portugues.cache.adapter.in_memory_adapter:
         class: NilPortugues\Cache\Adapter\InMemoryAdapter
-        
+
+    nil_portugues.cache.adapter.sql.mysql_adapter:
+        class: NilPortugues\Cache\Adapter\SQL\MySqlAdapter
+        arguments:
+          - [%mysql_server.master%]
+          - @nil_portugues.cache.adapter.in_memory_adapter
+
     nil_portugues.cache.adapter.redis.native_adapter:
         class: NilPortugues\Cache\Adapter\Redis\NativeAdapter
         arguments:

@@ -1,7 +1,24 @@
 <?php
 
 return [
-    'redis_servers' => [
-        ['host' =>'127.0.0.1', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1', 'timeout' => 1],
+    'redis_servers'    => [
+        'cache1 ' => [
+            'alias'    => 'cache1',
+            'host'     => '127.0.0.1',
+            'port'     => 6379,
+            'database' => 1,
+            'timeout'  => 1
+        ],
     ],
+    'mysql_connection' => [
+        'master' => [
+            'user'     => 'dbuser',
+            'password' => 'dbpassword',
+            'database' => [
+                'dbname' => 'my_database',
+                'host'   => 'localhost',
+                'port'   => 3306,
+            ],
+        ],
+    ]
 ];

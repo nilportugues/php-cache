@@ -1,3 +1,18 @@
-  parameters:
-    redis_servers:
-        {host: 127.0.0.1, port: 6379, database: 1, alias: cache1, timeout: 1}
+parameters:
+
+  mysql_connection: 
+    master: 
+      database: 
+        dbname: my_database
+        host: localhost
+        port: 3306
+      password: dbpassword
+      user: dbuser
+
+  redis_servers: 
+    cache1:
+      alias: cache1
+      database: 1
+      host: "127.0.0.1"
+      port: 6379
+      timeout: 1
