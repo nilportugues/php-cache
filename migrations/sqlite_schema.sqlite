@@ -1,0 +1,6 @@
+CREATE TABLE __cache(
+   cache_id CHAR(255) PRIMARY KEY,
+   cache_value TEXT NOT NULL,
+   cache_ttl DATETIME NOT NULL
+);
+CREATE INDEX cache_ttl_index ON __cache (cache_ttl);
