@@ -25,6 +25,17 @@ use PDOException;
  */
 abstract class AbstractAdapter extends Adapter implements CacheAdapter
 {
+    const CACHE_TTL   = 'cache_ttl';
+    const CACHE_VALUE = 'cache_value';
+
+    const TABLE_CACHE_ID    = 'cache_id';
+    const TABLE_CACHE_VALUE = 'cache_value';
+    const TABLE_CACHE_TTL   = 'cache_ttl';
+
+    const QUERY_ID_PLACEHOLDER    = ':id';
+    const QUERY_VALUE_PLACEHOLDER = ':value';
+    const QUERY_TTL_PLACEHOLDER   = ':ttl';
+
     /**
      * @var string
      */
@@ -73,31 +84,12 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function __construct(array $connection, $tableName, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
         $this->checkMandatoryParameterFields($connection);
-        $this->parameters = $connection;
-        $this->connection = $this->getConnection();
+        $this->parameters     = $connection;
+        $this->connection     = $this->getConnection();
         $this->cacheTableName = $tableName;
 
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;
-    }
-
-    /**
-     * @return object
-     */
-    public function getConnection()
-    {
-        $class = new \ReflectionClass($this->connectionClass);
-
-        $parameters = [
-            $this->parameters,
-            (!empty($this->parameters[AbstractPDOConnection::USER]))
-                ? $this->parameters[AbstractPDOConnection::USER] : null,
-            (!empty($this->parameters[AbstractPDOConnection::PASSWORD]))
-                ? $this->parameters[AbstractPDOConnection::PASSWORD] : null,
-            (!empty($this->parameters[AbstractPDOConnection::DRIVER_OPTIONS])) ?: [],
-        ];
-
-        return $class->newInstanceArgs($parameters);
     }
 
     /**
@@ -116,6 +108,24 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         }
     }
 
+    /**
+     * @return object
+     */
+    public function getConnection()
+    {
+        $class = new \ReflectionClass($this->connectionClass);
+
+        $parameters = [
+            $this->parameters,
+            (!empty($this->parameters[AbstractPDOConnection::USER]))
+                ? $this->parameters[AbstractPDOConnection::USER] : null,
+            (!empty($this->parameters[AbstractPDOConnection::PASSWORD]))
+                ? $this->parameters[AbstractPDOConnection::PASSWORD] : null,
+            (!empty($this->parameters[AbstractPDOConnection::DRIVER_OPTIONS])) ? : [],
+        ];
+
+        return $class->newInstanceArgs($parameters);
+    }
 
     /**
      * Get a value identified by $key.
@@ -137,11 +147,11 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         $result = $this->getFromDatabase($key);
 
         if (false === empty($result)) {
-            $ttl = new DateTime($result['cache_ttl']);
+            $ttl = new DateTime($result[self::CACHE_TTL]);
 
             if ($ttl >= new DateTime()) {
                 $this->hit = true;
-                $value     = $this->restoreDataStructure($result['cache_value']);
+                $value     = $this->restoreDataStructure($result[self::CACHE_VALUE]);
                 $this->inMemoryAdapter->set($key, $value, 0);
                 return $value;
             }
@@ -160,10 +170,17 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     {
         try {
             $stmt = $this->connection->prepare(
-                sprintf('SELECT cache_value, cache_ttl FROM %s WHERE cache_id = :id', $this->cacheTableName)
+                sprintf(
+                    'SELECT %s, %s FROM %s WHERE %s = %s',
+                    self::TABLE_CACHE_VALUE,
+                    self::TABLE_CACHE_TTL,
+                    $this->cacheTableName,
+                    self::TABLE_CACHE_ID,
+                    self::QUERY_ID_PLACEHOLDER
+                )
             );
 
-            $stmt->bindParam(':id', $key, PDO::PARAM_STR);
+            $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
             $stmt->execute();
             return (array)$stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -192,10 +209,15 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function deleteFromDatabase($key)
     {
         $stmt = $this->connection->prepare(
-            sprintf('DELETE FROM %s WHERE cache_id = :id', $this->cacheTableName)
+            sprintf(
+                'DELETE FROM %s WHERE %s = %s',
+                $this->cacheTableName,
+                self::TABLE_CACHE_ID,
+                self::QUERY_ID_PLACEHOLDER
+            )
         );
 
-        $stmt->bindParam(':id', $key, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
         $stmt->execute();
     }
 
@@ -224,23 +246,71 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      * @param     $key
      * @param     $value
      * @param int $ttl
+     *
+     * @return $this
      */
     protected function insertToDatabase($key, $value, $ttl = 0)
     {
-        $stmt = $this->connection->prepare(
-            sprintf(
-                'INSERT INTO %s(cache_id, cache_value, cache_ttl) VALUES(:id, :value, :ttl)',
-                $this->cacheTableName
-            )
-        );
-
         $calculatedTtl = $this->fromDefaultTtl($ttl);
         $calculatedTtl = new DateTime(date('Y-m-d H:i:s', $calculatedTtl));
 
-        $stmt->bindParam(':id', $key, PDO::PARAM_STR);
-        $stmt->bindParam(':value', $value, PDO::PARAM_STR);
-        $stmt->bindParam(':ttl', $calculatedTtl->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $databaseValue = $this->getFromDatabase($key);
+        if (false === empty($databaseValue)) {
+            $this->updateToDatabase($key, $value, $calculatedTtl);
+            return $this;
+        }
+
+        $stmt = $this->connection->prepare(
+            sprintf(
+                'INSERT INTO %s(%s, %s, %s) VALUES(%s, %s, %s)',
+                $this->cacheTableName,
+                self::TABLE_CACHE_ID,
+                self::TABLE_CACHE_VALUE,
+                self::TABLE_CACHE_TTL,
+                self::QUERY_ID_PLACEHOLDER,
+                self::QUERY_VALUE_PLACEHOLDER,
+                self::QUERY_TTL_PLACEHOLDER
+            )
+        );
+
+        $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $calculatedTtl->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
+
+        return $this;
+    }
+
+    /**
+     * @param     $key
+     * @param     $value
+     * @param int $ttl
+     *
+     * @return $this
+     */
+    private function updateToDatabase($key, $value, $ttl = 0)
+    {
+        $stmt = $this->connection->prepare(
+            sprintf(
+                'UPDATE %s SET %s = %s, %s = %s, %s = %s WHERE %s = %s',
+                $this->cacheTableName,
+                self::TABLE_CACHE_ID,
+                self::QUERY_ID_PLACEHOLDER,
+                self::TABLE_CACHE_VALUE,
+                self::QUERY_VALUE_PLACEHOLDER,
+                self::TABLE_CACHE_TTL,
+                self::QUERY_TTL_PLACEHOLDER,
+                self::TABLE_CACHE_ID,
+                self::QUERY_ID_PLACEHOLDER
+            )
+        );
+
+        $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $ttl, PDO::PARAM_STR);
+        $stmt->execute();
+
+        return $this;
     }
 
     /**
@@ -254,7 +324,11 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
 
         try {
             $this->connection->exec(
-                sprintf('SELECT cache_id FROM %s LIMIT 1', $this->cacheTableName)
+                sprintf(
+                    'SELECT %s FROM %s LIMIT 1',
+                    self::TABLE_CACHE_ID,
+                    $this->cacheTableName
+                )
             );
         } catch (PDOException $e) {
             $available = false;
@@ -284,11 +358,16 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function clearFromDatabase()
     {
         $stmt = $this->connection->prepare(
-            sprintf('DELETE FROM %s WHERE cache_ttl < :ttl', $this->cacheTableName)
+            sprintf(
+                'DELETE FROM %s WHERE %s < %s',
+                $this->cacheTableName,
+                self::TABLE_CACHE_TTL,
+                self::QUERY_TTL_PLACEHOLDER
+            )
         );
 
         $now = new DateTime();
-        $stmt->bindParam(':ttl', $now->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $now->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
     }
 
