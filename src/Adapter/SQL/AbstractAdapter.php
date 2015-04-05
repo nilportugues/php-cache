@@ -274,7 +274,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         );
 
         $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
-        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $this->storageDataStructure($value), PDO::PARAM_STR);
         $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $calculatedTtl->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         $stmt->execute();
 
@@ -306,7 +306,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         );
 
         $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
-        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $this->storageDataStructure($value), PDO::PARAM_STR);
         $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $ttl, PDO::PARAM_STR);
         $stmt->execute();
 
