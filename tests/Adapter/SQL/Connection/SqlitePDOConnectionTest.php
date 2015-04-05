@@ -54,7 +54,7 @@ class SqlitePDOConnectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testItShouldThrowORMConnectionExceptionIfDatabaseDataIsMissing()
+    public function testItShouldThrowInvalidArgumentExceptionIfDatabaseDataIsMissing()
     {
         $parameters = [
             SqlitePDOConnection::USER           => '',
@@ -65,7 +65,7 @@ class SqlitePDOConnectionTest extends \PHPUnit_Framework_TestCase
         $this->getPDOConnection($parameters);
     }
 
-    public function testItShouldThrowORMConnectionExceptionOnConnectionFailure()
+    public function testItShouldThrowInvalidArgumentExceptionOnConnectionFailure()
     {
         $parameters = $this->getConnectionFailParameterArray();
         $this->setExpectedException('InvalidArgumentException');

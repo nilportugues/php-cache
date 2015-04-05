@@ -99,7 +99,7 @@ class MySqlPDOConnectionTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testItShouldThrowORMConnectionExceptionIfDatabaseDataIsMissing()
+    public function testItShouldThrowInvalidArgumentExceptionIfDatabaseDataIsMissing()
     {
         $parameters = [
             MySqlPDOConnection::USER           => '',
@@ -110,7 +110,7 @@ class MySqlPDOConnectionTest extends \PHPUnit_Framework_TestCase
         $this->getPDOConnection($parameters);
     }
 
-    public function testItShouldThrowORMConnectionExceptionOnConnectionFailure()
+    public function testItShouldThrowInvalidArgumentExceptionOnConnectionFailure()
     {
         $parameters = $this->getConnectionFailParameterArray();
         $this->setExpectedException('InvalidArgumentException');

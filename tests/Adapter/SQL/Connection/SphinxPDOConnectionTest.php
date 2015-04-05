@@ -47,7 +47,7 @@ class SphinxPDOConnectionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testItShouldThrowORMConnectionExceptionIfDatabaseDataIsMissing()
+    public function testItShouldThrowInvalidArgumentExceptionIfDatabaseDataIsMissing()
     {
         $parameters = [
             SphinxPDOConnection::USER           => '',
@@ -73,7 +73,7 @@ class SphinxPDOConnectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testItShouldThrowORMConnectionExceptionOnConnectionFailure()
+    public function testItShouldThrowInvalidArgumentExceptionOnConnectionFailure()
     {
         $parameters = $this->getConnectionFailParameterArray();
         $this->setExpectedException('InvalidArgumentException');
@@ -98,7 +98,7 @@ class SphinxPDOConnectionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testItShouldThrowORMConnectionExceptionOnConnectionFailureWithSocket()
+    public function testItShouldThrowInvalidArgumentExceptionOnConnectionFailureWithSocket()
     {
         $parameters = [
             SphinxPDOConnection::USER           => $this->username,
