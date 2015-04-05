@@ -61,6 +61,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         $this->hit = false;
 
         $inMemoryValue = $this->inMemoryAdapter->get($key);
+
         if ($this->inMemoryAdapter->isHit()) {
             $this->hit = true;
             return $inMemoryValue;
@@ -72,7 +73,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
             if ($value) {
                 $this->hit = true;
                 $value     = $this->restoreDataStructure($value);
-                $this->inMemoryAdapter->set($key, $value);
+                $this->inMemoryAdapter->set($key, $value, 0);
                 return $value;
             }
         }
@@ -103,7 +104,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
                 }
             }
 
-            $this->inMemoryAdapter->set($key, $value);
+            $this->inMemoryAdapter->set($key, $value, $ttl);
             if (null !== $this->nextAdapter) {
                 $this->nextAdapter->set($key, $value, $ttl);
             }
@@ -121,6 +122,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function delete($key)
     {
         $this->redis->del($key);
+        $this->inMemoryAdapter->delete($key);
 
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->delete($key);
@@ -134,6 +136,8 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
+        $this->inMemoryAdapter->clear();
+
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->clear();
         }
@@ -147,6 +151,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function drop()
     {
         $this->redis->flushDB();
+        $this->inMemoryAdapter->drop();
 
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->drop();

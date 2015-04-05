@@ -22,28 +22,21 @@ class NativeAdapter extends AbstractAdapter
      */
     public function __construct(array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
-        if (false === class_exists('\Redis')) {
-            throw new \Exception(
-                sprintf(
-                    'Redis extension for PHP is not installed on the system, use %s class instead.',
-                    PredisAdapter::class
-                )
-            );
-        }
+        $this->isRedisExtensionAvailable();
 
         try {
             $connections = array_values($connections);
+            $this->connected = true;
 
             $this->redis = new Redis();
-            $this->redis->connect($connections[0]['host'], $connections[0]['port']);
+            $this->redis->connect($connections[0]['host'], $connections[0]['port'], $connections[0]['timeout']);
             $this->redis->select($connections[0]['database']);
-            $this->connected = true;
         } catch (RedisException $e) {
             $this->connected = false;
         }
 
         $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = $next;
+        $this->nextAdapter     = ($inMemory === $next) ? null: $next;
     }
 
 
@@ -62,5 +55,21 @@ class NativeAdapter extends AbstractAdapter
         }
 
         return $available;
+    }
+
+    /**
+     * @throws \Exception
+     * @codeCoverageIgnore
+     */
+    private function isRedisExtensionAvailable()
+    {
+        if (false === class_exists('\Redis')) {
+            throw new \Exception(
+                sprintf(
+                    'Redis extension for PHP is not installed on the system, use %s class instead.',
+                    PredisAdapter::class
+                )
+            );
+        }
     }
 }

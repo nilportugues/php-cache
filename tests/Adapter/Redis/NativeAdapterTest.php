@@ -10,10 +10,37 @@
 
 namespace NilPortugues\Tests\Cache\Adapter\Redis;
 
+use NilPortugues\Cache\Adapter\InMemoryAdapter;
+use NilPortugues\Cache\Adapter\Redis\NativeAdapter;
+
 /**
  * Class NativeAdapterTest
  * @package NilPortugues\Tests\Cache\Adapter\Redis
  */
 class NativeAdapterTest extends \PHPUnit_Framework_TestCase
 {
+    private $nextAdapter;
+    private $inMemoryAdapter;
+
+    protected function setUp()
+    {
+        $this->inMemoryAdapter = new InMemoryAdapter();
+        $this->nextAdapter = new InMemoryAdapter();
+    }
+
+    protected function tearDown()
+    {
+        $this->inMemoryAdapter = null;
+        $this->nextAdapter = null;
+    }
+
+    public function testNativeClientThrowsExceptionAndConnectionIsNotEstablished()
+    {
+        $connections = [
+            ['host' => '255.0.0.0', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1', 'timeout' => 1]
+        ];
+
+        $cache = new NativeAdapter($connections, $this->inMemoryAdapter, $this->nextAdapter);
+        $this->assertFalse($cache->isAvailable());
+    }
 }

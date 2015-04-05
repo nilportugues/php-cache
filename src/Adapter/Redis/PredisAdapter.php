@@ -23,9 +23,9 @@ class PredisAdapter extends AbstractAdapter
         $this->nextAdapter     = ($inMemory === $next) ? null: $next;
 
         try {
+            $this->connected = true;
             $this->redis = new Client($connections);
             $this->redis->connect();
-            $this->connected = true;
         } catch (\Exception $e) {
             $this->connected = false;
         }

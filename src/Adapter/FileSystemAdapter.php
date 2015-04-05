@@ -83,6 +83,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             $value = $this->restoreDataStructure(file_get_contents($fileKey));
             if ($value['expires'] >= (new DateTime())) {
                 $this->hit = true;
+                $this->inMemoryAdapter->set($key, $value['value'], 0);
                 return $value['value'];
             }
 
