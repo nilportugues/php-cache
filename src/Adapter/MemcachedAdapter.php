@@ -2,6 +2,7 @@
 
 namespace NilPortugues\Cache\Adapter;
 
+use Memcached;
 use NilPortugues\Cache\CacheAdapter;
 
 /**
@@ -10,6 +11,36 @@ use NilPortugues\Cache\CacheAdapter;
  */
 class MemcachedAdapter extends Adapter implements CacheAdapter
 {
+    /**
+     * @var Memcached
+     */
+    private $memcached;
+
+    /**
+     * @param string $persistentId
+     * @param array           $connections
+     * @param InMemoryAdapter $inMemory
+     * @param CacheAdapter    $next
+     */
+    public function __construct($persistentId, array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    {
+        $this->inMemoryAdapter = $inMemory;
+        $this->nextAdapter     = ($inMemory === $next) ? null: $next;
+
+        $connections = array_unique($connections);
+        $this->memcached = new Memcached($persistentId);
+        $this->memcached->addServers($connections);
+
+        $this->memcached->setOption(Memcached::OPT_SERIALIZER,
+            ($this->memcached->getOption(Memcached::HAVE_IGBINARY))
+                ? Memcached::SERIALIZER_IGBINARY : Memcached::SERIALIZER_PHP
+        );
+
+        $this->memcached->setOption(Memcached::OPT_DISTRIBUTION, Memcached::DISTRIBUTION_CONSISTENT);
+        $this->memcached->setOption(Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
+        $this->memcached->setOption(Memcached::OPT_NO_BLOCK, true);
+    }
+
     /**
      * Get a value identified by $key.
      *
@@ -53,7 +84,8 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function isAvailable()
     {
-        // TODO: Implement isAvailable() method.
+        $stats = $this->memcached->getStats();
+        return false === empty($stats);
     }
 
     /**

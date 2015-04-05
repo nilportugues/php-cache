@@ -24,7 +24,6 @@ class PredisAdapter extends AbstractAdapter
 
         try {
             $this->connected = true;
-
             $this->redis = new Client($connections);
             $this->redis->connect();
         } catch (\Exception $e) {
