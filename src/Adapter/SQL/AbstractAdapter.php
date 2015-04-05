@@ -66,14 +66,16 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
 
     /**
      * @param array           $connection
+     * @param string          $tableName
      * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      */
-    public function __construct(array $connection, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct(array $connection, $tableName, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
         $this->checkMandatoryParameterFields($connection);
         $this->parameters = $connection;
-        $this->connection = $this->getConnection($connection['type']);
+        $this->connection = $this->getConnection();
+        $this->cacheTableName = $tableName;
 
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;

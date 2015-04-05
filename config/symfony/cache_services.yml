@@ -9,6 +9,7 @@ services:
         class: NilPortugues\Cache\Adapter\SQL\MySqlAdapter
         arguments:
           - [%mysql_server.master%]
+          - %mysql_server.cache_table%
           - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.redis.native_adapter:

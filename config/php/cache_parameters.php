@@ -11,9 +11,10 @@ return [
         ],
     ],
     'mysql_connection' => [
+        'cache_table' => '__cache',
         'master' => [
-            'user'     => 'dbuser',
-            'password' => 'dbpassword',
+            'user'     => 'root',
+            'password' => '',
             'database' => [
                 'dbname' => 'my_database',
                 'host'   => 'localhost',

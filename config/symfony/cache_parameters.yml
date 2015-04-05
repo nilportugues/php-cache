@@ -1,6 +1,7 @@
 parameters:
 
-  mysql_connection: 
+  mysql_connection:
+    cache_table: '__cache'
     master: 
       database: 
         dbname: my_database
