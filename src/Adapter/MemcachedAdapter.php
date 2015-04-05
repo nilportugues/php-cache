@@ -24,11 +24,30 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function __construct($persistentId, array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
+        $this->isMemcachedExtensionAvailable();
+        $this->setUpMemcached($persistentId, array_unique(array_values($connections)));
+
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;
+    }
 
-        $connections     = array_values($connections);
-        $connections     = array_unique($connections);
+    /**
+     * @throws \Exception
+     * @codeCoverageIgnore
+     */
+    private function isMemcachedExtensionAvailable()
+    {
+        if (false === class_exists('\Memcached')) {
+            throw new \Exception('Memcached extension for PHP is not installed on the system.');
+        }
+    }
+
+    /**
+     * @param string $persistentId
+     * @param array $connections
+     */
+    private function setUpMemcached($persistentId, array $connections)
+    {
         $this->memcached = new Memcached($persistentId);
         $this->memcached->addServers($connections);
 
@@ -88,7 +107,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
         if ($ttl >= 0) {
             $this->memcached->set($key, $value);
 
-            if ($ttl>0) {
+            if ($ttl > 0) {
                 $this->memcached->touch($key, time() + $ttl);
             }
 
