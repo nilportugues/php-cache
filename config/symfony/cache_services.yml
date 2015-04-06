@@ -5,20 +5,20 @@ services:
     nil_portugues.cache.adapter.in_memory_adapter:
         class: NilPortugues\Cache\Adapter\InMemoryAdapter
 
-    nil_portugues.cache.adapter.sql.mysql_adapter:
-        class: NilPortugues\Cache\Adapter\SQL\MySqlAdapter
+    nil_portugues.cache.adapter.mysql_adapter:
+        class: NilPortugues\Cache\Adapter\MySqlAdapter
         arguments:
           - [%mysql_server.master%]
           - %mysql_server.cache_table%
           - @nil_portugues.cache.adapter.in_memory_adapter
 
-    nil_portugues.cache.adapter.redis.native_adapter:
+    nil_portugues.cache.adapter.redis_adapter:
         class: NilPortugues\Cache\Adapter\Redis\RedisAdapter
         arguments:
           - [%redis_servers%]
           - @nil_portugues.cache.adapter.in_memory_adapter
           
-    nil_portugues.cache.adapter.redis.predis_adapter:
+    nil_portugues.cache.adapter.predis_adapter:
         class: NilPortugues\Cache\Adapter\Redis\PredisAdapter
         arguments:
           - [%redis_servers%]
@@ -27,5 +27,5 @@ services:
     nil_portugues.cache:
         class: NilPortugues\Cache\Cache
         arguments:
-          - @nil_portugues.cache.adapter.redis.native_adapter
+          - @nil_portugues.cache.adapter.redis_adapter
           - "namespaced.cache"
