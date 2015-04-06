@@ -29,6 +29,17 @@ abstract class Adapter implements CacheAdapter
     protected $ttl;
 
     /**
+     * @var CacheAdapter|null
+     */
+    protected $nextAdapter;
+
+    /**
+     * @var InMemoryAdapter
+     */
+    protected $inMemoryAdapter;
+
+
+    /**
      * Check if value was found in the cache or not.
      *
      * @return bool
@@ -89,5 +100,56 @@ abstract class Adapter implements CacheAdapter
     protected function restoreDataStructure($value)
     {
         return unserialize($value);
+    }
+
+    /**
+     *
+     */
+    protected function clearChain()
+    {
+        $this->inMemoryAdapter->clear();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->clear();
+        }
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @param $ttl
+     */
+    protected function setChain($key, $value, $ttl)
+    {
+        $this->inMemoryAdapter->set($key, $value, $ttl);
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->set($key, $value, $ttl);
+        }
+    }
+
+    /**
+     *
+     */
+    protected function dropChain()
+    {
+        $this->inMemoryAdapter->drop();
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->drop();
+        }
+    }
+
+
+    /**
+     * @param $key
+     */
+    protected function deleteChain($key)
+    {
+        $this->inMemoryAdapter->delete($key);
+
+        if (null !== $this->nextAdapter) {
+            $this->nextAdapter->delete($key);
+        }
     }
 }

@@ -43,7 +43,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function delete($key)
     {
-        // TODO: Implement delete() method.
+        $this->deleteChain($key);
     }
 
     /**
@@ -63,7 +63,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
-        // TODO: Implement clear() method.
+        $this->clearChain();
     }
 
     /**
@@ -73,6 +73,6 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function drop()
     {
-        // TODO: Implement drop() method.
+        $this->dropChain();
     }
 }

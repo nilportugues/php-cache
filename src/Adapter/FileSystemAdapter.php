@@ -15,16 +15,6 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     const CACHE_FILE_SUFFIX = '.php.cache';
 
     /**
-     * @var CacheAdapter|null
-     */
-    private $nextAdapter;
-
-    /**
-     * @var InMemoryAdapter
-     */
-    private $inMemoryAdapter;
-
-    /**
      * @var string
      */
     private $cacheDir;
@@ -165,12 +155,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             $calculatedTtl = $this->getCalculatedTtl($ttl);
             $data          = $this->buildDataCache($value, $calculatedTtl);
             file_put_contents($this->getFilenameFromCacheKey($key), $data);
-
-            $this->inMemoryAdapter->set($key, $value, $ttl);
-
-            if (null !== $this->nextAdapter) {
-                $this->nextAdapter->set($key, $value, $ttl);
-            }
+            $this->setChain($key, $value, $ttl);
         }
 
         return $this;
@@ -222,11 +207,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             $this->removeCacheFile($fileKey);
         }
 
-        $this->inMemoryAdapter->delete($key);
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->delete($key);
-        }
+        $this->deleteChain($key);
     }
 
     /**
@@ -247,11 +228,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     public function clear()
     {
         $this->clearCacheFiles($this->cacheDir);
-        $this->inMemoryAdapter->clear();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->clear();
-        }
+        $this->clearChain();
     }
 
     /**
@@ -279,11 +256,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     public function drop()
     {
         $this->removeCacheFiles($this->cacheDir);
-        $this->inMemoryAdapter->drop();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->drop();
-        }
+        $this->dropChain();
     }
 
     /**

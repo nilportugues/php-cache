@@ -21,11 +21,6 @@ use NilPortugues\Cache\CacheAdapter;
 abstract class AbstractAdapter extends Adapter implements CacheAdapter
 {
     /**
-     * @var CacheAdapter|null
-     */
-    protected $nextAdapter;
-
-    /**
      * Redis client instance
      *
      * @var \Redis|\Predis\Client
@@ -36,11 +31,6 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      * @var bool
      */
     protected $connected;
-
-    /**
-     * @var InMemoryAdapter
-     */
-    protected $inMemoryAdapter;
 
     /**
      * @param array           $connections
@@ -104,10 +94,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
                 }
             }
 
-            $this->inMemoryAdapter->set($key, $value, $ttl);
-            if (null !== $this->nextAdapter) {
-                $this->nextAdapter->set($key, $value, $ttl);
-            }
+            $this->setChain($key, $value, $ttl);
         }
 
         return $this;
@@ -122,11 +109,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function delete($key)
     {
         $this->redis->del($key);
-        $this->inMemoryAdapter->delete($key);
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->delete($key);
-        }
+        $this->deleteChain($key);
     }
 
     /**
@@ -136,11 +119,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
-        $this->inMemoryAdapter->clear();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->clear();
-        }
+        $this->clearChain();
     }
 
     /**
@@ -151,10 +130,6 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function drop()
     {
         $this->redis->flushDB();
-        $this->inMemoryAdapter->drop();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->drop();
-        }
+        $this->dropChain();
     }
 }

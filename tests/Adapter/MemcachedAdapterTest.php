@@ -10,7 +10,6 @@
 
 namespace NilPortugues\Tests\Cache\Adapter;
 
-use DateTime;
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\Adapter\MemcachedAdapter;
 
@@ -74,7 +73,7 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $this->cache->set('cached.value.key', 1);
         $this->inMemoryAdapter->drop();
-        
+
         $this->assertEquals(1, $this->cache->get('cached.value.key'));
         $this->assertTrue($this->cache->isHit());
     }

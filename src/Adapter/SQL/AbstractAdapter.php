@@ -52,16 +52,6 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected $cacheTableName;
 
     /**
-     * @var InMemoryAdapter
-     */
-    protected $inMemoryAdapter;
-
-    /**
-     * @var CacheAdapter
-     */
-    protected $nextAdapter;
-
-    /**
      * @var array
      */
     protected $parameters = [];
@@ -196,11 +186,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function delete($key)
     {
         $this->deleteFromDatabase($key);
-        $this->inMemoryAdapter->delete($key);
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->delete($key);
-        }
+        $this->deleteChain($key);
     }
 
     /**
@@ -233,11 +219,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function set($key, $value, $ttl = 0)
     {
         $this->insertToDatabase($key, $value, $ttl);
-
-        $this->inMemoryAdapter->set($key, $value, $ttl);
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->set($key, $value, $ttl);
-        }
+        $this->setChain($key, $value, $ttl);
 
         return $this;
     }
@@ -345,11 +327,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function clear()
     {
         $this->clearFromDatabase();
-        $this->inMemoryAdapter->clear();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->clear();
-        }
+        $this->clearChain();
     }
 
     /**
@@ -379,11 +357,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     public function drop()
     {
         $this->dropFromDatabase();
-        $this->inMemoryAdapter->drop();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->drop();
-        }
+        $this->dropChain();
     }
 
     /**

@@ -111,10 +111,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
                 $this->memcached->touch($key, time() + $ttl);
             }
 
-            $this->inMemoryAdapter->set($key, $value, $ttl);
-            if (null !== $this->nextAdapter) {
-                $this->nextAdapter->set($key, $value, $ttl);
-            }
+            $this->setChain($key, $value, $ttl);
         }
 
         return $this;
@@ -128,11 +125,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     public function delete($key)
     {
         $this->memcached->delete($key);
-        $this->inMemoryAdapter->delete($key);
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->delete($key);
-        }
+        $this->deleteChain($key);
     }
 
     /**
@@ -153,11 +146,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function clear()
     {
-        $this->inMemoryAdapter->clear();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->clear();
-        }
+        $this->clearChain();
     }
 
     /**
@@ -168,10 +157,6 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     public function drop()
     {
         $this->memcached->flush();
-        $this->inMemoryAdapter->drop();
-
-        if (null !== $this->nextAdapter) {
-            $this->nextAdapter->drop();
-        }
+        $this->dropChain();
     }
 }
