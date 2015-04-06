@@ -60,18 +60,75 @@ return $services;
 #### 3.2. Usage
 
 
-### 4. Quality
+### 4. Other configurations
+
+#### 4.1 ElasticSearch as cache
+
+##### Enabling TTL expire every second
+It is important that you configure your ElasticSearch by appending the following line to the elasticsearch.yml file:
+
+```yml
+indices.ttl.interval: 1s
+```
+
+Now restart the ElasticSearch daemon.
+
+##### Creating the cache index
+
+Create the **cache** index and enable TTL by default.
+
+```sh
+curl -XDELETE 'http://localhost:9200/index_name'
+
+curl -XPOST http://localhost:9200/index_name -d '{
+    "mappings" : {
+        "cache" : {
+            "_source" : { "enabled" : false },
+            "_ttl": {"enabled": true , "default" : "1000ms" },
+            "properties" : {
+                "value" : { "type" : "string", "index" : "not_analyzed" }
+            }
+        }
+    }
+}'
+```
+
+You may test it issuing using this command:
+
+```sh
+curl -XPOST 'http://localhost:9200/index_name/cache/dilbert?ttl=2s' -d '{ "value" : "Dilbert Brown"}'
+```
+
+Wait 2 seconds and issue this:
+
+```sh
+curl -XGET 'http://localhost:9200/index_name/cache/dilbert?pretty=1&fields=_source,_ttl'
+```
+
+Response should indicate that "exists: false", meaning the dilbert entry has expired from cache.
+
+
+#### 4.2 Sphinx as cache
+
+#### 4.3 MySQL as cache
+
+#### 4.4 Postgres as cache
+
+#### 4.5 Sqlite as cache
+
+
+### 5. Quality
 
 To run the PHPUnit tests at the command line, go to the tests directory and issue phpunit.
 
 This library attempts to comply with PSR-1, PSR-2, and PSR-4. If you notice compliance oversights, please send a patch via pull request.
 
-### 5. Author [↑](#index_block)
+### 6. Author
 Nil Portugués Calderó
 
  - <contact@nilportugues.com>
  - [http://nilportugues.com](http://nilportugues.com)
 
-### 6. License [↑](#index_block)
+### 7. License
 The code base is licensed under the MIT license.
 

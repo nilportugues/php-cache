@@ -2,6 +2,8 @@
 
 namespace NilPortugues\Cache\Adapter;
 
+use DateTime;
+use InvalidArgumentException;
 use NilPortugues\Cache\CacheAdapter;
 
 /**
@@ -11,6 +13,37 @@ use NilPortugues\Cache\CacheAdapter;
 class ElasticSearchAdapter extends Adapter implements CacheAdapter
 {
     /**
+     * @var string
+     */
+    private $base = '';
+
+    /**
+     * @var string
+     */
+    private $baseUrl = '';
+
+    /**
+     * @param string          $baseUrl
+     * @param string          $indexName
+     * @param InMemoryAdapter $inMemory
+     * @param CacheAdapter    $next
+     *
+     * @throws InvalidArgumentException
+     */
+    public function __construct($baseUrl, $indexName, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    {
+        $baseUrl   = (string)$baseUrl;
+        $indexName = (string)$indexName;
+
+        $this->base = $baseUrl;
+        $this->baseUrl = sprintf("%s/%s/cache", $baseUrl, $indexName);
+
+        if (false === filter_var($this->baseUrl, FILTER_VALIDATE_URL)) {
+            throw new InvalidArgumentException('The provided base URL is not a valid URL');
+        }
+    }
+
+    /**
      * Get a value identified by $key.
      *
      * @param  string $key
@@ -19,7 +52,86 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function get($key)
     {
-        // TODO: Implement get() method.
+        $key       = (string)$key;
+        $this->hit = false;
+
+        $inMemoryValue = $this->inMemoryAdapter->get($key);
+        if ($this->inMemoryAdapter->isHit()) {
+            $this->hit = true;
+            return $inMemoryValue;
+        }
+
+        $value = $this->curlGet($key);
+
+        if (null !== $value) {
+            $this->hit = true;
+            $this->inMemoryAdapter->set($key, $value, 0);
+            return $value;
+        }
+
+        return (null !== $this->nextAdapter) ? $this->nextAdapter->get($key) : null;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed|null
+     */
+    private function curlGet($key)
+    {
+        $curlHandler = $this->curlHandler($key,'?fields=_source,_ttl');
+
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
+
+        if (false !== $response) {
+            $response = json_decode($response, true);
+
+            if (true == $response['exists'] && $response['fields']['_ttl']>0) {
+               return $this->restoreDataStructure($response["_source"]['value']);
+            }
+            $this->delete($key);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return resource
+     */
+    private function curlHandler($key)
+    {
+        $curlHandler = curl_init();
+
+        curl_setopt($curlHandler, CURLOPT_URL, sprintf("{$this->baseUrl}/%s", $key));
+        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+
+        return $curlHandler;
+    }
+
+    /**
+     * Delete a value identified by $key.
+     *
+     * @param  string $key
+     */
+    public function delete($key)
+    {
+        $this->curlDelete($key);
+        $this->deleteChain($key);
+    }
+
+    /**
+     * @param $key
+     */
+    private function curlDelete($key)
+    {
+        $curlHandler = $this->curlHandler($key);
+        curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
+
+        curl_exec($curlHandler);
+        curl_close($curlHandler);
     }
 
     /**
@@ -33,17 +145,27 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function set($key, $value, $ttl = 0)
     {
-        // TODO: Implement set() method.
-    }
+        $ttl = $this->fromDefaultTtl($ttl);
 
-    /**
-     * Delete a value identified by $key.
-     *
-     * @param  string $key
-     */
-    public function delete($key)
-    {
-        $this->deleteChain($key);
+        if ($ttl >= 0) {
+            $curlHandler = $this->curlHandler($key.'?ttl='.($ttl*1000).'ms');
+
+            curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curlHandler, CURLOPT_POST, true);
+            curl_setopt($curlHandler, CURLOPT_POSTFIELDS, ['value' => $this->storageDataStructure($value)]);
+
+            $response = curl_exec($curlHandler);
+            if (false !== $response) {
+                $response = json_decode($response, true);
+
+                if(array_key_exists('ok', $response) && true == $response['ok']) {
+                    $this->setChain($key, $value, $ttl);
+                }
+            }
+            curl_close($curlHandler);
+        }
+
+        return $this;
     }
 
     /**
@@ -67,12 +189,29 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     }
 
     /**
+     *
+     */
+    private function curlClear()
+    {
+
+    }
+
+    /**
      * Clears all values from the cache.
      *
      * @return mixed
      */
     public function drop()
     {
+        $this->curlDrop();
         $this->dropChain();
+    }
+
+    /**
+     *
+     */
+    private function curlDrop()
+    {
+
     }
 }

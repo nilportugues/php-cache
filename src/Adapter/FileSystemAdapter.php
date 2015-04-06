@@ -76,8 +76,8 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
                 $this->inMemoryAdapter->set($key, $value['value'], 0);
                 return $value['value'];
             }
-
             $this->removeCacheFile($fileKey);
+            $this->deleteChain($key);
         }
 
         return (null !== $this->nextAdapter) ? $this->nextAdapter->get($key) : null;
