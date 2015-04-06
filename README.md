@@ -20,7 +20,7 @@ php composer.phar require nilportugues/cache
 - Memcached
 - Redis
   - Native (php5-redis)
-  - Client (Predis)
+  - Memcached (Predis)
 
 ### 3. Use case
 

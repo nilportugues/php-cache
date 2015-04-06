@@ -2,7 +2,7 @@
 
 namespace NilPortugues\Cache\Adapter;
 
-use Memcached;
+use NilPortugues\Cache\Adapter\Memcached\Memcached;
 use NilPortugues\Cache\CacheAdapter;
 
 /**
@@ -14,7 +14,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     /**
      * @var Memcached
      */
-    private $memcached;
+    protected $memcached;
 
     /**
      * @param string          $persistentId
@@ -24,42 +24,21 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function __construct($persistentId, array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
-        $this->isMemcachedExtensionAvailable();
-        $this->setUpMemcached($persistentId, array_unique(array_values($connections)));
-
+        $this->memcached       = $this->getMemcachedClient($persistentId, array_unique(array_values($connections)));
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;
     }
 
     /**
-     * @throws \Exception
-     * @codeCoverageIgnore
-     */
-    private function isMemcachedExtensionAvailable()
-    {
-        if (false === class_exists('\Memcached')) {
-            throw new \Exception('Memcached extension for PHP is not installed on the system.');
-        }
-    }
-
-    /**
      * @param string $persistentId
      * @param array $connections
+     *
+     * @codeCoverageIgnore
+     * @return Memcached
      */
-    private function setUpMemcached($persistentId, array $connections)
+    protected function getMemcachedClient($persistentId, array $connections)
     {
-        $this->memcached = new Memcached($persistentId);
-        $this->memcached->addServers($connections);
-
-        $this->memcached->setOption(
-            Memcached::OPT_SERIALIZER,
-            (defined(Memcached::HAVE_IGBINARY) && Memcached::HAVE_IGBINARY)
-                ? Memcached::SERIALIZER_IGBINARY : Memcached::SERIALIZER_PHP
-        );
-
-        $this->memcached->setOption(Memcached::OPT_DISTRIBUTION, Memcached::DISTRIBUTION_CONSISTENT);
-        $this->memcached->setOption(Memcached::OPT_LIBKETAMA_COMPATIBLE, true);
-        $this->memcached->setOption(Memcached::OPT_BINARY_PROTOCOL, true);
+        return new Memcached($persistentId, $connections);
     }
 
     /**

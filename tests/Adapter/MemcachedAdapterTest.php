@@ -11,7 +11,7 @@
 namespace NilPortugues\Tests\Cache\Adapter;
 
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
-use NilPortugues\Cache\Adapter\MemcachedAdapter;
+use NilPortugues\Tests\Cache\Adapter\Memcached\DummyMemcachedAdapter;
 
 class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,13 +26,10 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
     protected $nextAdapter;
 
     /**
-     * @var MemcachedAdapter
+     * @var DummyMemcachedAdapter
      */
     protected $cache;
 
-    /**
-     * @return MemcachedAdapter
-     */
     protected function setUp()
     {
         $this->inMemoryAdapter = new InMemoryAdapter();
@@ -43,7 +40,7 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
             'weight' => 1
         ];
 
-        $this->cache = new MemcachedAdapter('__cache', [$connections], $this->inMemoryAdapter, $this->nextAdapter);
+        $this->cache = new DummyMemcachedAdapter('__cache', [$connections], $this->inMemoryAdapter, $this->nextAdapter);
         $this->cache->drop();
     }
 
@@ -112,7 +109,6 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $this->cache->get('cached.value.key1'));
         $this->assertEquals(null, $this->cache->get('cached.value.key2'));
     }
-
 
     public function testItCanDropCache()
     {
