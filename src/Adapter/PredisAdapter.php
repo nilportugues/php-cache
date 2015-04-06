@@ -1,8 +1,8 @@
 <?php
 
-namespace NilPortugues\Cache\Adapter\Redis;
+namespace NilPortugues\Cache\Adapter;
 
-use NilPortugues\Cache\Adapter\InMemoryAdapter;
+use NilPortugues\Cache\Adapter\Redis\AbstractAdapter;
 use NilPortugues\Cache\CacheAdapter;
 use Predis\Client;
 

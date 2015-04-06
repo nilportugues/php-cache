@@ -3,7 +3,7 @@ include_once realpath(dirname(__FILE__)).'/../../vendor/autoload.php';
 
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\Adapter\MemcachedAdapter;
-use NilPortugues\Cache\Adapter\Redis\NativeAdapter;
+use NilPortugues\Cache\Adapter\Redis\RedisAdapter;
 use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
 use NilPortugues\Cache\Adapter\SQL\MySqlAdapter;
 use NilPortugues\Cache\Cache;
@@ -12,7 +12,7 @@ $parameters = include_once realpath(dirname(__FILE__)).'/cache_parameters.php';
 
 $inMemoryAdapter = new InMemoryAdapter();
 
-$nativeRedisAdapter = new NativeAdapter(
+$nativeRedisAdapter = new RedisAdapter(
     $parameters['redis_servers'],
     $inMemoryAdapter
 );

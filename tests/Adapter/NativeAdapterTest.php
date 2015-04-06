@@ -11,13 +11,13 @@
 namespace NilPortugues\Tests\Cache\Adapter\Redis;
 
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
-use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
+use NilPortugues\Cache\Adapter\RedisAdapter;
 
 /**
- * Class PredisAdapterTest
+ * Class NativeAdapterTest
  * @package NilPortugues\Tests\Cache\Adapter\Redis
  */
-class PredisAdapterTest extends \PHPUnit_Framework_TestCase
+class NativeAdapterTest extends \PHPUnit_Framework_TestCase
 {
     private $nextAdapter;
     private $inMemoryAdapter;
@@ -34,13 +34,13 @@ class PredisAdapterTest extends \PHPUnit_Framework_TestCase
         $this->nextAdapter = null;
     }
 
-    public function testPredisClientThrowsExceptionAndConnectionIsNotEstablished()
+    public function testNativeClientThrowsExceptionAndConnectionIsNotEstablished()
     {
         $connections = [
-            ['host' => '255.0.0.0', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1']
+            ['host' => '255.0.0.0', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1', 'timeout' => 1]
         ];
 
-        $cache = new PredisAdapter($connections, $this->inMemoryAdapter, $this->nextAdapter);
+        $cache = new RedisAdapter($connections, $this->inMemoryAdapter, $this->nextAdapter);
         $this->assertFalse($cache->isAvailable());
     }
 }

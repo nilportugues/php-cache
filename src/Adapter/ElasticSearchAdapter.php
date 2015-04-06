@@ -214,7 +214,6 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
                     $this->setChain($key, $value, $ttl);
                 }
             }
-
         }
 
         return $this;

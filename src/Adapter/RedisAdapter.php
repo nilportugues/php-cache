@@ -1,17 +1,17 @@
 <?php
 
-namespace NilPortugues\Cache\Adapter\Redis;
+namespace NilPortugues\Cache\Adapter;
 
-use NilPortugues\Cache\Adapter\InMemoryAdapter;
+use NilPortugues\Cache\Adapter\Redis\AbstractAdapter;
 use NilPortugues\Cache\CacheAdapter;
 use Redis;
 use RedisException;
 
 /**
- * Class NativeAdapter
+ * Class RedisAdapter
  * @package NilPortugues\Cache\Adapter\Redis
  */
-class NativeAdapter extends AbstractAdapter
+class RedisAdapter extends AbstractAdapter
 {
     /**
      * @param array           $connections
@@ -67,7 +67,7 @@ class NativeAdapter extends AbstractAdapter
             throw new \Exception(
                 sprintf(
                     'Redis extension for PHP is not installed on the system, use %s class instead.',
-                    PredisAdapter::class
+                    '\NilPortugues\Cache\Adapter\PredisAdapter'
                 )
             );
         }

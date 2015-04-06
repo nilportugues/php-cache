@@ -13,7 +13,7 @@ services:
           - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.redis.native_adapter:
-        class: NilPortugues\Cache\Adapter\Redis\NativeAdapter
+        class: NilPortugues\Cache\Adapter\Redis\RedisAdapter
         arguments:
           - [%redis_servers%]
           - @nil_portugues.cache.adapter.in_memory_adapter
