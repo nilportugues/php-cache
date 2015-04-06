@@ -10,6 +10,7 @@
 
 namespace NilPortugues\Tests\Cache\Adapter\Memcached;
 
+use DateTime;
 use NilPortugues\Cache\Adapter\Memcached\MemcachedClient;
 
 /**
@@ -19,13 +20,24 @@ use NilPortugues\Cache\Adapter\Memcached\MemcachedClient;
 class DummyMemcachedClient implements MemcachedClient
 {
     /**
+     * @var array
+     */
+    private $registry = [];
+    
+    /**
      * @param $key
      *
      * @return mixed
      */
     public function get($key)
     {
-        // TODO: Implement get() method.
+        if (true === array_key_exists($key, $this->registry)) {
+            if ($this->registry[$key]['ttl'] >= new DateTime()) {
+                return $this->registry[$key]['value'];
+            }
+            $this->delete($key);
+        }
+        return null;
     }
 
     /**
@@ -36,7 +48,10 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function set($key, $value)
     {
-        // TODO: Implement set() method.
+        $this->registry[$key] = [
+            'value' => $value,
+            'ttl' => new DateTime(date('Y-m-d H:i:s', strtotime(sprintf('now +10 years'))))
+        ];
     }
 
     /**
@@ -45,7 +60,11 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function touch($key, $expiration)
     {
-        // TODO: Implement touch() method.
+        if (true === array_key_exists($key, $this->registry)) {
+            $this->registry[$key]['ttl'] = new DateTime(
+                date('Y-m-d H:i:s', strtotime(sprintf('now +s seconds', $expiration)))
+            );
+        }
     }
 
     /**
@@ -55,7 +74,9 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function delete($key)
     {
-        // TODO: Implement delete() method.
+        if (true === array_key_exists($key, $this->registry)) {
+            unset($this->registry[$key]);
+        }
     }
 
     /**
@@ -71,6 +92,6 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function flush()
     {
-        // TODO: Implement flush() method.
+        $this->registry = [];
     }
 }
