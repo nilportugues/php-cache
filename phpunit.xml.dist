@@ -37,6 +37,7 @@
             <directory>./src</directory>
             <exclude>
                 <directory suffix=".php">./src/Adapter/SQL/Connection</directory>
+                <directory suffix=".php">./src/Adapter/ElasticSearch/</directory>
             </exclude>
         </whitelist>
     </filter>

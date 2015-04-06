@@ -3,7 +3,6 @@
 namespace NilPortugues\Cache\Adapter;
 
 use NilPortugues\Cache\Adapter\SQL\AbstractAdapter;
-use NilPortugues\Cache\Adapter\SQL\Connection\SphinxPDOConnection;
 
 /**
  * Class SphinxAdapter
@@ -14,7 +13,7 @@ class SphinxAdapter extends AbstractAdapter
     /**
      * @var string
      */
-    protected $connectionClass = SphinxPDOConnection::class;
+    protected $connectionClass = 'NilPortugues\Cache\Adapter\SQL\Connection\SphinxPDOConnection';
 
     /**
      * @var array
