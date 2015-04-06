@@ -23,6 +23,29 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     private $baseUrl = '';
 
     /**
+     * @var array
+     */
+    private $createCache = [
+        "mappings" => [
+            "cache" => [
+                "_source"    => [
+                    "enabled" => false
+                ],
+                "_ttl"       => [
+                    "enabled" => true,
+                    "default" => "1000ms"
+                ],
+                "properties" => [
+                    "value" => [
+                        "type"  => "string",
+                        "index" => "not_analyzed"
+                    ]
+                ]
+            ]
+        ]
+    ];
+
+    /**
      * @param string          $baseUrl
      * @param string          $indexName
      * @param InMemoryAdapter $inMemory
@@ -35,12 +58,47 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         $baseUrl   = (string)$baseUrl;
         $indexName = (string)$indexName;
 
-        $this->base = $baseUrl;
+        $this->base    = sprintf("%s/%s", $baseUrl, $indexName);
         $this->baseUrl = sprintf("%s/%s/cache", $baseUrl, $indexName);
 
-        if (false === filter_var($this->baseUrl, FILTER_VALIDATE_URL)) {
+        if (false === filter_var($this->base, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException('The provided base URL is not a valid URL');
         }
+
+        if (false === $this->curlCacheIndexExists()) {
+            $this->curlCreateCacheIndex();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function curlCacheIndexExists()
+    {
+        $curlHandler = curl_init();
+        curl_setopt($curlHandler, CURLOPT_URL, sprintf("{$this->base}/%s", '_settings'));
+        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($curlHandler);
+
+        if (false !== $response) {
+            $response = json_decode($response, true);
+            return array_key_exists('index_name', $response);
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     */
+    private function curlCreateCacheIndex()
+    {
+        $curlHandler = curl_init();
+        curl_setopt($curlHandler, CURLOPT_URL, $this->base);
+        curl_setopt($curlHandler, CURLOPT_POST, true);
+        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, json_encode($this->createCache));
+        curl_exec($curlHandler);
     }
 
     /**
@@ -79,7 +137,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     private function curlGet($key)
     {
-        $curlHandler = $this->curlHandler($key,'?fields=_source,_ttl');
+        $curlHandler = $this->curlHandler($key, '?fields=_source,_ttl');
 
         $response = curl_exec($curlHandler);
         curl_close($curlHandler);
@@ -87,8 +145,8 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         if (false !== $response) {
             $response = json_decode($response, true);
 
-            if (true == $response['exists'] && $response['fields']['_ttl']>0) {
-               return $this->restoreDataStructure($response["_source"]['value']);
+            if (true == $response['exists'] && $response['fields']['_ttl'] > 0) {
+                return $this->restoreDataStructure($response["_source"]['value']);
             }
             $this->delete($key);
         }
@@ -148,7 +206,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
-            $curlHandler = $this->curlHandler($key.'?ttl='.($ttl*1000).'ms');
+            $curlHandler = $this->curlHandler($key . '?ttl=' . $ttl . 's');
 
             curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($curlHandler, CURLOPT_POST, true);
@@ -158,7 +216,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
             if (false !== $response) {
                 $response = json_decode($response, true);
 
-                if(array_key_exists('ok', $response) && true == $response['ok']) {
+                if (array_key_exists('ok', $response) && true == $response['ok']) {
                     $this->setChain($key, $value, $ttl);
                 }
             }
@@ -189,14 +247,6 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     }
 
     /**
-     *
-     */
-    private function curlClear()
-    {
-
-    }
-
-    /**
      * Clears all values from the cache.
      *
      * @return mixed
@@ -204,6 +254,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     public function drop()
     {
         $this->curlDrop();
+        $this->curlCreateCacheIndex();
         $this->dropChain();
     }
 
@@ -212,6 +263,9 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     private function curlDrop()
     {
-
+        $curlHandler = curl_init();
+        curl_setopt($curlHandler, CURLOPT_URL, $this->base);
+        curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_exec($curlHandler);
     }
 }
