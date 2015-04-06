@@ -19,7 +19,7 @@
         "issues": "https://github.com/nilopc/cache-layer/issues"
     },
     "require": {
-        "php": ">=5.5",
+        "php": ">=5.4",
         "predis/predis": "1.1.*@dev"
     },
     "require-dev": {

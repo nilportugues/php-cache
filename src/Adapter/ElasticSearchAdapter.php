@@ -3,6 +3,7 @@
 namespace NilPortugues\Cache\Adapter;
 
 use InvalidArgumentException;
+use NilPortugues\Cache\Adapter\ElasticSearch\Curl;
 use NilPortugues\Cache\CacheAdapter;
 
 /**
@@ -11,6 +12,11 @@ use NilPortugues\Cache\CacheAdapter;
  */
 class ElasticSearchAdapter extends Adapter implements CacheAdapter
 {
+    /**
+     * @var \NilPortugues\Cache\Adapter\ElasticSearch\Curl
+     */
+    private $curl;
+
     /**
      * @var string
      */
@@ -56,6 +62,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     {
         $baseUrl   = (string)$baseUrl;
         $indexName = (string)$indexName;
+        $this->curl = $this->getCurlClient();
 
         $this->base    = sprintf("%s/%s", $baseUrl, $indexName);
         $this->baseUrl = sprintf("%s/%s/cache", $baseUrl, $indexName);
@@ -64,40 +71,21 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
             throw new InvalidArgumentException('The provided base URL is not a valid URL');
         }
 
-        if (false === $this->curlCacheIndexExists()) {
-            $this->curlCreateCacheIndex();
+        if (false === $this->curl->cacheIndexExists()) {
+            $this->curl->createCacheIndex($this->base, $this->createCache);
         }
+
+        $this->inMemoryAdapter = $inMemory;
+        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
     }
 
     /**
-     * @return bool
+     * @codeCoverageIgnore
+     * @return Curl
      */
-    private function curlCacheIndexExists()
+    protected function getCurlClient()
     {
-        $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, sprintf("{$this->base}/%s", '_settings'));
-        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($curlHandler);
-
-        if (false !== $response) {
-            $response = json_decode($response, true);
-            return array_key_exists('index_name', $response);
-        }
-
-        return false;
-    }
-
-    /**
-     *
-     */
-    private function curlCreateCacheIndex()
-    {
-        $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, $this->base);
-        curl_setopt($curlHandler, CURLOPT_POST, true);
-        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, json_encode($this->createCache));
-        curl_exec($curlHandler);
+        return new Curl();
     }
 
     /**
@@ -118,54 +106,15 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
             return $inMemoryValue;
         }
 
-        $value = $this->curlGet($key);
+        $value = $this->curl->get($key);
 
         if (null !== $value) {
             $this->hit = true;
             $this->inMemoryAdapter->set($key, $value, 0);
-            return $value;
+            return $this->restoreDataStructure($value);
         }
 
         return (null !== $this->nextAdapter) ? $this->nextAdapter->get($key) : null;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return mixed|null
-     */
-    private function curlGet($key)
-    {
-        $curlHandler = $this->curlHandler($key, '?fields=_source,_ttl');
-
-        $response = curl_exec($curlHandler);
-        curl_close($curlHandler);
-
-        if (false !== $response) {
-            $response = json_decode($response, true);
-
-            if (true == $response['exists'] && $response['fields']['_ttl'] > 0) {
-                return $this->restoreDataStructure($response["_source"]['value']);
-            }
-            $this->delete($key);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return resource
-     */
-    private function curlHandler($key)
-    {
-        $curlHandler = curl_init();
-
-        curl_setopt($curlHandler, CURLOPT_URL, sprintf("{$this->baseUrl}/%s", $key));
-        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
-
-        return $curlHandler;
     }
 
     /**
@@ -175,20 +124,8 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function delete($key)
     {
-        $this->curlDelete($key);
+        $this->curl->delete($key);
         $this->deleteChain($key);
-    }
-
-    /**
-     * @param $key
-     */
-    private function curlDelete($key)
-    {
-        $curlHandler = $this->curlHandler($key);
-        curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
-
-        curl_exec($curlHandler);
-        curl_close($curlHandler);
     }
 
     /**
@@ -205,7 +142,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
-            $response = $this->curlSet($key, $value, $ttl);
+            $response = $this->curl->set($key, $this->storageDataStructure($value), $ttl);
 
             if (false !== $response) {
                 $response = json_decode($response, true);
@@ -220,33 +157,13 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @param $ttl
-     *
-     * @return mixed
-     */
-    private function curlSet($key, $value, $ttl)
-    {
-        $curlHandler = $this->curlHandler($key . '?ttl=' . $ttl . 's');
-
-        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlHandler, CURLOPT_POST, true);
-        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, ['value' => $this->storageDataStructure($value)]);
-
-        $response = curl_exec($curlHandler);
-        curl_close($curlHandler);
-        return $response;
-    }
-
-    /**
      * Checks the availability of the cache service.
      *
      * @return bool
      */
     public function isAvailable()
     {
-        return $this->curlCacheIndexExists();
+        return $this->curl->cacheIndexExists();
     }
 
     /**
@@ -266,19 +183,8 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function drop()
     {
-        $this->curlDrop();
-        $this->curlCreateCacheIndex();
+        $this->curl->drop($this->base);
+        $this->curl->createCacheIndex($this->base, $this->createCache);
         $this->dropChain();
-    }
-
-    /**
-     *
-     */
-    private function curlDrop()
-    {
-        $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, $this->base);
-        curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_exec($curlHandler);
     }
 }
