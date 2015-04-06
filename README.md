@@ -75,7 +75,7 @@ Now restart the ElasticSearch daemon.
 
 ##### Creating the cache index
 
-Create the **cache** index and enable TTL by default.
+Create the cache index, for eg: **index_name** and enable TTL by default.
 
 ```sh
 curl -XDELETE 'http://localhost:9200/index_name'
@@ -96,7 +96,7 @@ curl -XPOST http://localhost:9200/index_name -d '{
 You may test it issuing using this command:
 
 ```sh
-curl -XPOST 'http://localhost:9200/index_name/cache/dilbert?ttl=2s' -d '{ "value" : "Dilbert Brown"}'
+curl -XPOST 'http://localhost:9200/index_name/cache/dilbert?ttl=2s' -d '{"value":"Dilbert Brown"}'
 ```
 
 Wait 2 seconds and issue this:
