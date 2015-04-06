@@ -2,7 +2,6 @@
 
 namespace NilPortugues\Cache\Adapter;
 
-use DateTime;
 use InvalidArgumentException;
 use NilPortugues\Cache\CacheAdapter;
 
@@ -206,13 +205,8 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         $ttl = $this->fromDefaultTtl($ttl);
 
         if ($ttl >= 0) {
-            $curlHandler = $this->curlHandler($key . '?ttl=' . $ttl . 's');
+            $response = $this->curlSet($key, $value, $ttl);
 
-            curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curlHandler, CURLOPT_POST, true);
-            curl_setopt($curlHandler, CURLOPT_POSTFIELDS, ['value' => $this->storageDataStructure($value)]);
-
-            $response = curl_exec($curlHandler);
             if (false !== $response) {
                 $response = json_decode($response, true);
 
@@ -220,10 +214,30 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
                     $this->setChain($key, $value, $ttl);
                 }
             }
-            curl_close($curlHandler);
+
         }
 
         return $this;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @param $ttl
+     *
+     * @return mixed
+     */
+    private function curlSet($key, $value, $ttl)
+    {
+        $curlHandler = $this->curlHandler($key . '?ttl=' . $ttl . 's');
+
+        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curlHandler, CURLOPT_POST, true);
+        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, ['value' => $this->storageDataStructure($value)]);
+
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
+        return $response;
     }
 
     /**
@@ -233,7 +247,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     public function isAvailable()
     {
-        // TODO: Implement isAvailable() method.
+        return $this->curlCacheIndexExists();
     }
 
     /**
