@@ -64,7 +64,6 @@ return $services;
 
 #### 4.1 ElasticSearch as cache
 
-##### Enabling TTL expire every second
 It is important that you configure your ElasticSearch by appending the following line to the **elasticsearch.yml** file:
 
 ```yml
