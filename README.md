@@ -10,17 +10,16 @@ php composer.phar require nilportugues/cache
 ```
 
 ### 2. Drivers Available
-- InMemory
-- FileSystem
-- SQL
-- SphinxQL
-- Sqlite
-- MongoDB
-- ElasticSearch
-- Memcached
-- Redis
-  - Native (php5-redis)
-  - Memcached (Predis)
+- **Memory:** InMemoryAdapter
+- **FileSystem:** FileSystemAdapter
+- **MySQL:** MySqlAdapter
+- **PostgreSql:** PostgreSqlAdapterAdapter
+- **SphinxQL:** SphinxAdapter
+- **Sqlite:** SqliteAdapter
+- **MongoDB:** MongoDBAdapter
+- **ElasticSearch:** ElasticSearchAdapter
+- **Memcached:** MemcachedAdapter *(php5-memcached)*
+- **Redis:** RedisAdapter *(php5-redis)*, PredisAdapter *(Predis)*
 
 ### 3. Use case
 
