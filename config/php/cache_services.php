@@ -40,5 +40,6 @@ return [
     'nil_portugues.cache.adapter.sql.mysql_adapter' => $mysqlAdapter,
     'nil_portugues.cache.adapter.redis.native_adapter' => $nativeRedisAdapter,
     'nil_portugues.cache.adapter.redis.predis_adapter' => $predisRedisAdapter,
-    'nil_portugues.cache' => new Cache($nativeRedisAdapter, 'namespaced.cache'),
+    'nil_portugues.user_cache' => new Cache($nativeRedisAdapter, 'user'),
+    'nil_portugues.image_cache' => new Cache($nativeRedisAdapter, 'image'),
 ];
