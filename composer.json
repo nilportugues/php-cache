@@ -46,6 +46,7 @@
         }
     },
     "suggest": {
+        "ext-curl": "Native curl support for php.",
         "ext-redis": "Native redis support for php.",
         "ext-memcached": "Native memcached support for php."
     }

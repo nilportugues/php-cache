@@ -18,7 +18,29 @@ use PDO;
  */
 class DummyPDO extends PDO
 {
+    /**
+     * @var bool
+     */
+    protected $throwException = false;
+
     public function __construct()
     {
+    }
+
+    /**
+     * @return $this
+     */
+    public function setThrowException()
+    {
+        $this->throwException = true;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getThrowException()
+    {
+        return $this->throwException;
     }
 }

@@ -114,7 +114,8 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
             (!empty($this->parameters[AbstractPDOConnection::DRIVER_OPTIONS])) ? : [],
         ];
 
-        return $class->newInstanceArgs($parameters);
+        $pdo = $class->newInstanceArgs($parameters);
+        return $pdo->getConnection();
     }
 
     /**
@@ -172,7 +173,10 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
 
             $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
             $stmt->execute();
-            return (array)$stmt->fetch(PDO::FETCH_ASSOC);
+
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return (is_bool($result)) ? [] : $result;
+
         } catch (PDOException $e) {
             return [];
         }
@@ -224,6 +228,21 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         return $this;
     }
 
+
+    /**
+     * @param $ttl
+     *
+     * @return int
+     */
+    private function getCalculatedTtl($ttl)
+    {
+        $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
+        if (0 == $ttl) {
+            $calculatedTtl = strtotime('now +10 years');
+        }
+        return $calculatedTtl;
+    }
+
     /**
      * @param     $key
      * @param     $value
@@ -233,8 +252,10 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      */
     protected function insertToDatabase($key, $value, $ttl = 0)
     {
+        $value = $this->storageDataStructure($value);
+
         $calculatedTtl = $this->fromDefaultTtl($ttl);
-        $calculatedTtl = new DateTime(date('Y-m-d H:i:s', $calculatedTtl));
+        $calculatedTtl = new DateTime(date('Y-m-d H:i:s', $this->getCalculatedTtl($calculatedTtl)));
 
         $databaseValue = $this->getFromDatabase($key);
         if (false === empty($databaseValue)) {
@@ -256,8 +277,9 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         );
 
         $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
-        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $this->storageDataStructure($value), PDO::PARAM_STR);
-        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $calculatedTtl->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
+        $calculatedTtl = $calculatedTtl->format('Y-m-d H:i:s');
+        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $calculatedTtl, PDO::PARAM_STR);
         $stmt->execute();
 
         return $this;
@@ -288,7 +310,8 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         );
 
         $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
-        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $this->storageDataStructure($value), PDO::PARAM_STR);
+        $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
+        $ttl = $ttl->format('Y-m-d H:i:s');
         $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $ttl, PDO::PARAM_STR);
         $stmt->execute();
 

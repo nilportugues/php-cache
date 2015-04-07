@@ -37,11 +37,6 @@ class DummyPDOConnection extends AbstractPDOConnection
     protected $query = '';
 
     /**
-     * @var bool
-     */
-    protected $throwException = false;
-
-    /**
      * @var string
      */
     private $cacheId;
@@ -77,23 +72,6 @@ class DummyPDOConnection extends AbstractPDOConnection
     public function getConnection()
     {
         return new DummyPDO();
-    }
-
-    /**
-     * @return $this
-     */
-    public function setThrowException()
-    {
-        $this->throwException = true;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getThrowException()
-    {
-        return $this->throwException;
     }
 
 
