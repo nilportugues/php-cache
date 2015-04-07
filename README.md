@@ -13,7 +13,7 @@ php composer.phar require nilportugues/cache
 - **Memory:** InMemoryAdapter
 - **FileSystem:** FileSystemAdapter
 - **MySQL:** MySqlAdapter
-- **PostgreSql:** PostgreSqlAdapterAdapter
+- **PostgreSql:** PostgreSqlAdapter
 - **SphinxQL:** SphinxAdapter
 - **Sqlite:** SqliteAdapter
 - **MongoDB:** MongoDBAdapter
@@ -36,24 +36,35 @@ Using a Service Container, such as Symfony2's or a simple array of services, def
 
 ```php
 <?php
+include_once realpath(dirname(__FILE__)).'/../../vendor/autoload.php';
+
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
-use NilPortugues\Cache\Adapter\Redis\PredisAdapter;
+use NilPortugues\Cache\Adapter\MemcachedAdapter;
+use NilPortugues\Cache\Adapter\PredisAdapter;
 use NilPortugues\Cache\Cache;
 
-$params = [
-  'redis_servers' => [
-      ['host' =>'127.0.0.1', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1'],
-  ],
+$parameters = include_once realpath(dirname(__FILE__)).'/cache_parameters.php';
+
+$inMemoryAdapter = new InMemoryAdapter();
+
+$predisRedisAdapter = new PredisAdapter(
+    $parameters['redis_servers'],
+    $inMemoryAdapter
+);
+
+$memcachedAdapter = new MemcachedAdapter(
+    $parameters['memcached_servers']['persistent_id'],
+    $parameters['memcached_servers']['connections'],
+    $inMemoryAdapter
+);
+
+return [
+    'cache.adapter.in_memory_adapter' => $inMemoryAdapter,
+    'cache.adapter.memcached_adapter' => $memcachedAdapter,
+    'cache.adapter.redis.predis_adapter' => $predisRedisAdapter,
+    'user_cache' => new Cache($predisRedisAdapter, 'user'),
+    'image_cache' => new Cache($predisRedisAdapter, 'image'),
 ];
-
-//Array acting as a Service Container
-$services = [];
-
-$services['in_memory_adapter'] = new InMemoryAdapter();
-$services['predis_adapter'] = new PredisAdapter($params['redis_servers'], $services['in_memory_adapter']);
-$services['cache'] = new Cache($services['predis_adapter'], 'namespaced.cache');
-
-return $services;
 ```
 
 #### 3.2. Usage
