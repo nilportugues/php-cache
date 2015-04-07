@@ -176,7 +176,6 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             return (is_bool($result)) ? [] : $result;
-
         } catch (PDOException $e) {
             return [];
         }

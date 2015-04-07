@@ -10,6 +10,8 @@
 
 namespace NilPortugues\Tests\Cache\Adapter\SQL;
 
+use DateTime;
+use NilPortugues\Cache\Adapter\SQL\AbstractAdapter;
 use PDO;
 use PDOException;
 
@@ -20,9 +22,34 @@ use PDOException;
 class DummyPDO extends PDO
 {
     /**
+     * @var array
+     */
+    protected $registry = [];
+
+    /**
+     * @var string
+     */
+    protected $key = '';
+
+    /**
      * @var string
      */
     protected $query = '';
+
+    /**
+     * @var string
+     */
+    private $cacheId;
+
+    /**
+     * @var string
+     */
+    private $cacheTtl;
+
+    /**
+     * @var string
+     */
+    private $cacheValue;
 
     /**
      * @var bool
@@ -31,6 +58,10 @@ class DummyPDO extends PDO
 
     public function __construct()
     {
+        $this->registry['already.cached'] = [
+            AbstractAdapter::TABLE_CACHE_VALUE => serialize(10),
+            AbstractAdapter::TABLE_CACHE_TTL => '2025-01-01 10:10:10'
+        ];
     }
 
     /**
@@ -50,10 +81,11 @@ class DummyPDO extends PDO
         return $this->throwException;
     }
 
-
     /**
      * @param string $query
+     *
      * @return int|void
+     * @throws \PDOException
      */
     public function exec($query)
     {
@@ -64,18 +96,139 @@ class DummyPDO extends PDO
 
 
     /**
-     * @param $query
+     * @param string $statement
+     * @param null   $options
      *
-     * @return DummyPDOStatement
+     * @return DummyPDOStatement|\PDOStatement
      */
-    public function prepare($query)
+    public function prepare($statement, $options = null)
     {
-        $queryParts = explode(' ', $query);
+        $queryParts = explode(' ', $statement);
         $queryParts = array_reverse($queryParts);
         $queryAction = array_pop($queryParts);
 
         $this->query = $queryAction;
 
-        return new DummyPDOStatement();
+        return new DummyPDOStatement($this);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCacheId()
+    {
+        return $this->cacheId;
+    }
+
+    /**
+     * @param mixed $cacheId
+     *
+     * @return $this
+     */
+    public function setCacheId($cacheId)
+    {
+        $this->cacheId = $cacheId;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCacheTtl()
+    {
+        return $this->cacheTtl;
+    }
+
+    /**
+     * @param mixed $cacheTtl
+     *
+     * @return $this
+     */
+    public function setCacheTtl($cacheTtl)
+    {
+        $this->cacheTtl = $cacheTtl;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCacheValue()
+    {
+        return $this->cacheValue;
+    }
+
+    /**
+     * @param mixed $cacheValue
+     *
+     * @return $this
+     */
+    public function setCacheValue($cacheValue)
+    {
+        $this->cacheValue = $cacheValue;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function get()
+    {
+        $value = [];
+
+        if (true === array_key_exists($this->getCacheId(), $this->registry)) {
+            $value = $this->registry[$this->getCacheId()];
+        }
+
+        $this->cacheId = null;
+        $this->cacheTtl = null;
+        $this->cacheValue = null;
+
+        return $value;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @param $ttl
+     */
+    public function set($key, $value, $ttl)
+    {
+        $this->registry[$key] = [
+            AbstractAdapter::TABLE_CACHE_VALUE => $value,
+            AbstractAdapter::TABLE_CACHE_TTL => $ttl
+        ];
+    }
+
+    /**
+     *
+     */
+    public function clear()
+    {
+        $now = new DateTime();
+        foreach (array_keys($this->registry) as $key) {
+            $ttl = new DateTime($this->registry[$key][AbstractAdapter::TABLE_CACHE_TTL]);
+
+            if ($ttl < $now) {
+                unset($this->registry[$key]);
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    public function drop()
+    {
+        $this->registry = [];
     }
 }

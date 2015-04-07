@@ -20,11 +20,15 @@ use PDOException;
 class DummyPDOStatement
 {
     /**
-     * @param DummyPDOConnection $connection
+     * @param DummyPDO $connection
      */
-    public function __construct(DummyPDOConnection $connection)
+    public function __construct(DummyPDO $connection)
     {
         $this->connection = $connection;
+
+        $this->connection->setCacheId(null);
+        $this->connection->setCacheValue(null);
+        $this->connection->setCacheTtl(null);
     }
 
     /**
@@ -89,7 +93,9 @@ class DummyPDOStatement
      */
     private function processDeleteCases()
     {
-        if (null !== $this->connection->getCacheTtl()) {
+        $ttl = $this->connection->getCacheTtl();
+        
+        if (!empty($ttl)) {
             $this->connection->clear();
             return $this;
         }
