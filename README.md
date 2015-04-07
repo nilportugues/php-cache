@@ -13,7 +13,7 @@ php composer.phar require nilportugues/cache
 - **Memory:** InMemoryAdapter
 - **FileSystem:** FileSystemAdapter
 - **MySQL:** MySqlAdapter
-- **Postgresql:** PostgresqlAdapter
+- **PostgreSql:** PostgreSqlAdapterAdapter
 - **SphinxQL:** SphinxAdapter
 - **Sqlite:** SqliteAdapter
 - **MongoDB:** MongoDBAdapter
