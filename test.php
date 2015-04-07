@@ -16,15 +16,18 @@ $connection = [
 
 $inMemoryAdapter = new InMemoryAdapter();
 $mysqlAdapter = new MySqlAdapter($connection, '__cache', $inMemoryAdapter);
-/*
 
-$mysqlAdapter->set('cache.this', $dateTime, 1000);
+/**
+ * TEST
+ */
+$dateTime = new \DateTime();
+$mysqlAdapter->set('cache.this', $dateTime);
 
 $cachedDateTime = $mysqlAdapter->get('cache.this');
+var_dump($cachedDateTime);
+var_dump($cachedDateTime->format('Y-m-d H:i:s') === $dateTime->format('Y-m-d H:i:s'));
 
-var_dump($cachedDateTime->format('Y-m-d H:i:s') === $dateTime->format('Y-m-d H:i:s'));*/
+$mysqlAdapter->delete('cache.this');
 
-//$dateTime = new \DateTime();
-//$mysqlAdapter->set('cache.this', $dateTime);
 $cachedDateTime = $mysqlAdapter->get('cache.this');
 var_dump($cachedDateTime);
