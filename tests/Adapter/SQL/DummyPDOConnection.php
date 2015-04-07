@@ -13,7 +13,6 @@ namespace NilPortugues\Tests\Cache\Adapter\SQL;
 use DateTime;
 use NilPortugues\Cache\Adapter\SQL\AbstractAdapter;
 use NilPortugues\Cache\Adapter\SQL\Connection\AbstractPDOConnection;
-use PDOException;
 
 /**
  * Class DummyPDOConnection
@@ -30,11 +29,6 @@ class DummyPDOConnection extends AbstractPDOConnection
      * @var string
      */
     protected $key = '';
-
-    /**
-     * @var string
-     */
-    protected $query = '';
 
     /**
      * @var string
@@ -75,33 +69,7 @@ class DummyPDOConnection extends AbstractPDOConnection
     }
 
 
-    /**
-     * @param $query
-     *
-     * @return DummyPDOStatement
-     */
-    public function prepare($query)
-    {
-        $queryParts = explode(' ', $query);
-        $queryParts = array_reverse($queryParts);
-        $queryAction = array_pop($queryParts);
 
-        $this->query = $queryAction;
-
-        return new DummyPDOStatement($this);
-    }
-
-    /**
-     * @param $query
-     *
-     * @throws \PDOException
-     */
-    public function exec($query)
-    {
-        if (true === $this->throwException) {
-            throw new PDOException();
-        }
-    }
 
     /**
      * @return array

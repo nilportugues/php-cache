@@ -11,6 +11,7 @@
 namespace NilPortugues\Tests\Cache\Adapter\SQL;
 
 use PDO;
+use PDOException;
 
 /**
  * Class DummyPDO
@@ -18,6 +19,11 @@ use PDO;
  */
 class DummyPDO extends PDO
 {
+    /**
+     * @var string
+     */
+    protected $query = '';
+
     /**
      * @var bool
      */
@@ -42,5 +48,34 @@ class DummyPDO extends PDO
     public function getThrowException()
     {
         return $this->throwException;
+    }
+
+
+    /**
+     * @param string $query
+     * @return int|void
+     */
+    public function exec($query)
+    {
+        if (true === $this->throwException) {
+            throw new PDOException();
+        }
+    }
+
+
+    /**
+     * @param $query
+     *
+     * @return DummyPDOStatement
+     */
+    public function prepare($query)
+    {
+        $queryParts = explode(' ', $query);
+        $queryParts = array_reverse($queryParts);
+        $queryAction = array_pop($queryParts);
+
+        $this->query = $queryAction;
+
+        return new DummyPDOStatement();
     }
 }
