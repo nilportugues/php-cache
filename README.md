@@ -16,7 +16,6 @@ php composer.phar require nilportugues/cache
 - **PostgreSql:** PostgreSqlAdapter
 - **SphinxQL:** SphinxAdapter
 - **Sqlite:** SqliteAdapter
-- **MongoDB:** MongoDBAdapter
 - **ElasticSearch:** ElasticSearchAdapter
 - **Memcached:** MemcachedAdapter *(php5-memcached)*
 - **Redis:** RedisAdapter *(php5-redis)*, PredisAdapter *(Predis)*
