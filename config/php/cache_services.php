@@ -28,6 +28,13 @@ $mysqlAdapter = new MySqlAdapter(
     $inMemoryAdapter
 );
 
+$sphinxAdapter = new SphinxAdapter(
+    $parameters['sphinx_servers']['connections'],
+    $parameters['sphinx_servers']['cache_table'],
+    $inMemoryAdapter
+);
+
+
 $memcachedAdapter = new MemcachedAdapter(
     $parameters['memcached_servers']['persistent_id'],
     $parameters['memcached_servers']['connections'],
@@ -38,6 +45,7 @@ return [
     'nil_portugues.cache.adapter.in_memory_adapter' => $inMemoryAdapter,
     'nil_portugues.cache.adapter.memcached_adapter' => $memcachedAdapter,
     'nil_portugues.cache.adapter.sql.mysql_adapter' => $mysqlAdapter,
+    'nil_portugues.cache.adapter.sql.sphinx_adapter' => $sphinxAdapter,
     'nil_portugues.cache.adapter.redis.native_adapter' => $nativeRedisAdapter,
     'nil_portugues.cache.adapter.redis.predis_adapter' => $predisRedisAdapter,
     'nil_portugues.user_cache' => new Cache($nativeRedisAdapter, 'user'),
