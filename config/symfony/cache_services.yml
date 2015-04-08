@@ -12,6 +12,13 @@ services:
           - %mysql_server.cache_table%
           - @nil_portugues.cache.adapter.in_memory_adapter
 
+    nil_portugues.cache.adapter.postgresql_adapter:
+        class: NilPortugues\Cache\Adapter\PostgreSqlAdapter
+        arguments:
+          - [%postgresql_server.master%]
+          - %postgresql_server.cache_table%
+          - @nil_portugues.cache.adapter.in_memory_adapter
+          
     nil_portugues.cache.adapter.sqlite_adapter:
         class: NilPortugues\Cache\Adapter\SqliteAdapter
         arguments:
@@ -23,7 +30,7 @@ services:
         class: NilPortugues\Cache\Adapter\SphinxAdapter
         arguments:
           - [%sphinx_server.master%]
-          - %sphinx_server.cache_index%
+          - %sphinx_server.cache_table%
           - @nil_portugues.cache.adapter.in_memory_adapter
           
     nil_portugues.cache.adapter.redis_adapter:
