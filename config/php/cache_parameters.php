@@ -23,12 +23,12 @@ return [
         ],
     ],
     'sphinx_servers' => [
-        'index_name' => 'cache',
+        'cache_table' => 'cache',
         'connections' => [
             'user'     => '',
             'password' => '',
             'database' => [
-                'dbname' => 'cache',
+                'dbname' => '',
                 'host'   => '127.0.0.1',
                 'port'   => 9306,
             ],
