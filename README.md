@@ -10,16 +10,26 @@ php composer.phar require nilportugues/cache
 ```
 
 ### 2. Drivers Available
-- **Memory:** InMemoryAdapter
-- **FileSystem:** FileSystemAdapter
-- **MySQL:** MySqlAdapter
-- **PostgreSql:** PostgreSqlAdapter
-- **SphinxQL:** SphinxAdapter
-- **Sqlite:** SqliteAdapter
-- **ElasticSearch:** ElasticSearchAdapter
+The package provides several implementations for a cache. Obvious choice is to make use of the Cache based adapters, which are the most performant and specialized, yet sometimes these are not available and other options should be considered, but we got you covered.
+
+#### Cache based: 
 - **Memcached:** MemcachedAdapter *(php5-memcached)*
 - **Redis:** RedisAdapter *(php5-redis)*, PredisAdapter *(Predis)*
 
+#### Full-text based:
+- **SphinxQL:** SphinxAdapter
+- **ElasticSearch:** ElasticSearchAdapter
+
+#### System based:
+- **Memory:** InMemoryAdapter
+- **FileSystem:** FileSystemAdapter
+
+#### Database based:
+- **MySQL:** MySqlAdapter
+- **PostgreSql:** PostgreSqlAdapter
+- **Sqlite:** SqliteAdapter
+
+- 
 ### 3. Use case
 
 - **1st level cache**: Redis (PredisAdapter) is our main cache, in a dedicated server.
