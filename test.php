@@ -86,3 +86,24 @@ $cachedDateTime = $redisAdapter->get('cache.this');
 var_dump($cachedDateTime);
  */
 
+/** SphinxQL TEST
+$connection = [
+    'user'     => '',
+    'password' => '',
+    'database' => [
+        'dbname' => 'cache',
+        'host'   => "127.0.0.1",
+        'port'   => 9306,
+    ],
+];
+$sphinxAdapter = new \NilPortugues\Cache\Adapter\SphinxAdapter($connection, 'cache', $inMemoryAdapter);
+$dateTime = new \DateTime();
+
+$sphinxAdapter->set('cache.this', $dateTime);
+$inMemoryAdapter->drop();
+var_dump($sphinxAdapter->get('cache.this'));
+
+$sphinxAdapter->set('cache.this', 'hello');
+$inMemoryAdapter->drop();
+var_dump($sphinxAdapter->get('cache.this'));
+*/

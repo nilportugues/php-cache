@@ -233,7 +233,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      *
      * @return int
      */
-    private function getCalculatedTtl($ttl)
+    protected function getCalculatedTtl($ttl)
     {
         $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
         if (0 == $ttl) {
@@ -285,13 +285,12 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     }
 
     /**
-     * @param     $key
-     * @param     $value
-     * @param int $ttl
-     *
+     * @param $key
+     * @param $value
+     * @param DateTime $ttl
      * @return $this
      */
-    private function updateToDatabase($key, $value, $ttl = 0)
+    protected function updateToDatabase($key, $value, DateTime $ttl)
     {
         $stmt = $this->connection->prepare(
             sprintf(
