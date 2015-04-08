@@ -22,6 +22,17 @@ return [
             ],
         ],
     ],
+    'sphinx_servers' => [
+        'connections' => [
+            'user'     => '',
+            'password' => '',
+            'database' => [
+                'dbname' => 'cache',
+                'host'   => '127.0.0.1',
+                'port'   => 9306,
+            ],
+        ],
+    ],    
     'memcached_servers' => [
         'persistent_id' => '__cache',
         'connections' => [
