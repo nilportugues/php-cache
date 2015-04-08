@@ -22,6 +22,18 @@ return [
             ],
         ],
     ],
+    'postgresql_servers' => [
+        'cache_table' => '__cache',
+        'connections' => [
+            'user'     => 'root',
+            'password' => '',
+            'database' => [
+                'dbname' => 'my_database',
+                'host'   => 'localhost',
+                'port'   => 5432,
+            ],
+        ],
+    ],
     'sphinx_servers' => [
         'cache_table' => 'cache',
         'connections' => [
