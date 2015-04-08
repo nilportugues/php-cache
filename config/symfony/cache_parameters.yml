@@ -11,9 +11,10 @@ parameters:
       user: "dbuser"
 
   sphinx_server:
+    cache_table: "cache"
     master:
       database:
-        dbname: "cache"
+        dbname: ""
         host: "127.0.0.1"
         port: 9306
       password: ""
