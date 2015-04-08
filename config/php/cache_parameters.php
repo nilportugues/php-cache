@@ -23,6 +23,7 @@ return [
         ],
     ],
     'sphinx_servers' => [
+        'index_name' => 'cache',
         'connections' => [
             'user'     => '',
             'password' => '',
