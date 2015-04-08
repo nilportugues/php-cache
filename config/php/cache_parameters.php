@@ -1,7 +1,10 @@
 <?php
 
 return [
-    'redis_servers'    => [
+    'filesystem' => [
+        'path' => '/tmp'
+    ],
+    'redis'    => [
         'cache1 ' => [
             'alias'    => 'cache1',
             'host'     => '127.0.0.1',
@@ -10,7 +13,7 @@ return [
             'timeout'  => 1
         ],
     ],
-    'mysql_servers' => [
+    'mysql' => [
         'cache_table' => '__cache',
         'connections' => [
             'user'     => 'root',
@@ -22,7 +25,7 @@ return [
             ],
         ],
     ],
-    'postgresql_servers' => [
+    'postgresql' => [
         'cache_table' => '__cache',
         'connections' => [
             'user'     => 'root',
@@ -34,7 +37,17 @@ return [
             ],
         ],
     ],
-    'sphinx_servers' => [
+    'sqlite' => [
+        'cache_table' => 'cache',
+        'connections' => [
+            'user'     => '',
+            'password' => '',
+            'database' => [
+                'path' => 'cache.db'
+            ],
+        ],
+    ],
+    'sphinx' => [
         'cache_table' => 'cache',
         'connections' => [
             'user'     => '',
@@ -46,7 +59,7 @@ return [
             ],
         ],
     ],    
-    'memcached_servers' => [
+    'memcached' => [
         'persistent_id' => '__cache',
         'connections' => [
             'server1' => [
@@ -55,5 +68,9 @@ return [
                 'weight' => 1
             ],
         ],
+    ],
+    'elastic' => [
+        'base_url' => 'http://localhost:8000',
+        'index_name' => 'cache'
     ]
 ];

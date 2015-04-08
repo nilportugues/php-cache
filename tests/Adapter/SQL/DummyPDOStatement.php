@@ -94,7 +94,7 @@ class DummyPDOStatement
     private function processDeleteCases()
     {
         $ttl = $this->connection->getCacheTtl();
-        
+
         if (!empty($ttl)) {
             $this->connection->clear();
             return $this;
