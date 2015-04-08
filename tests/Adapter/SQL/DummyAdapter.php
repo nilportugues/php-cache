@@ -21,5 +21,5 @@ class DummyAdapter extends AbstractAdapter
     /**
      * @var string
      */
-    protected $connectionClass = DummyPDOConnection::class;
+    protected $connectionClass = '\NilPortugues\Tests\Cache\Adapter\SQL\DummyPDOConnection';
 }

@@ -10,8 +10,6 @@
 
 namespace NilPortugues\Tests\Cache\Adapter\SQL;
 
-use DateTime;
-use NilPortugues\Cache\Adapter\SQL\AbstractAdapter;
 use NilPortugues\Cache\Adapter\SQL\Connection\AbstractPDOConnection;
 
 /**
