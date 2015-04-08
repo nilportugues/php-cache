@@ -1,6 +1,6 @@
 parameters:
 
-  mysql_servers:
+  mysql_server:
     cache_table: "__cache"
     master:
       database:
@@ -10,7 +10,7 @@ parameters:
       password: "dbpassword"
       user: "dbuser"
 
-  sphinx_servers:
+  sphinx_server:
     master:
       database:
         dbname: "cache"
