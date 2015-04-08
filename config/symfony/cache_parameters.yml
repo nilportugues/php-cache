@@ -1,18 +1,27 @@
 parameters:
 
-  mysql_connection:
-    cache_table: '__cache'
+  mysql_servers:
+    cache_table: "__cache"
     master:
       database:
-        dbname: my_database
-        host: localhost
+        dbname: "my_database"
+        host: "127.0.0.1"
         port: 3306
-      password: dbpassword
-      user: dbuser
+      password: "dbpassword"
+      user: "dbuser"
 
+  sphinx_servers:
+    master:
+      database:
+        dbname: "cache"
+        host: "127.0.0.1"
+        port: 9306
+      password: ""
+      user: ""
+      
   redis_servers:
     cache1:
-      alias: cache1
+      alias: "cache1"
       database: 1
       host: "127.0.0.1"
       port: 6379
