@@ -1,5 +1,13 @@
-# Cache layer
+ Cache layer
+=========================
+
+[![Build Status](https://travis-ci.org/nilportugues/cache.png)](https://travis-ci.org/nilportugues/cache) [![Coverage Status](https://img.shields.io/coveralls/nilportugues/cache.svg)](https://coveralls.io/r/nilportugues/cache?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nilportugues/cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nilportugues/cache/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/918cfa6d-997d-4e41-bdcb-d01970485074/mini.png)](https://insight.sensiolabs.com/projects/918cfa6d-997d-4e41-bdcb-d01970485074) [![Latest Stable Version](https://poser.pugx.org/nilportugues/cache/v/stable.svg)](https://packagist.org/packages/nilportugues/cache) [![Total Downloads](https://poser.pugx.org/nilportugues/cache/downloads.svg)](https://packagist.org/packages/nilportugues/cache) [![License](https://poser.pugx.org/nilportugues/cache/license.svg)](https://packagist.org/packages/nilportugues/cache) 
+
+ 
 Cache layer for PHP applications using the on the Chain of Responsability pattern.
+
+
+
 
 ### 1. Installation
 
