@@ -77,7 +77,7 @@ class Curl implements CurlClient
      */
     public function get($key)
     {
-        $curlHandler = $this->curlHandler($key, '?fields=_source,_ttl');
+        $curlHandler = $this->curlHandler($key.'?fields=_source,_ttl');
 
         $response = curl_exec($curlHandler);
         curl_close($curlHandler);
