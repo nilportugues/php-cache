@@ -36,7 +36,8 @@ Yet sometimes these are not available and other options should be considered, bu
 
 ### 4. Example
 
-    The more cache levels the slower the cache system will be, so leverage the cache to your needs. 
+    The more cache levels the slower the cache system will be, so leverage the 
+    cache to your needs. 
     Maybe you don't need a fallback mechanism at all! This is just an example.
 
 **1st level cache**: Redis (PredisAdapter) is our main cache, in a dedicated server.
