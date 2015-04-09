@@ -13,7 +13,16 @@ matrix:
     - php: nightly
   
 before_script:
-  - sudo apt-get install php5-redis redis-server
+  - mkdir -p ~/.rezzza/php/extensions && cd ~/.rezzza/php/extensions \
+    && git clone --depth=50 https://github.com/nicolasff/phpredis \
+    && cd phpredis \
+    && phpize \
+    && echo "Configuring phpredis..." \
+    && ./configure > /dev/null \
+    && echo "Building phpredis..." \
+    && make -j4 > /dev/null \
+    && echo "Installing phpredis..." \
+    && sudo make install > /dev/null
   - alias composer="php -d zend.enable_gc=0 /usr/bin/composer"
   - composer require --dev satooshi/php-coveralls:dev-master
   - composer install
