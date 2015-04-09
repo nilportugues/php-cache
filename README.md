@@ -8,7 +8,12 @@ The recommended way to install the Domain-driven design foundation package is th
 ```sh
 php composer.phar require nilportugues/cache
 ```
+---
+
 ### 2. Features
+
+
+---
 
 ### 3. Drivers Available
 The package provides several implementations for a key-value cache. 
@@ -33,6 +38,9 @@ Yet sometimes these are not available and other options should be considered, bu
 - **MySQL:** MySqlAdapter
 - **PostgreSql:** PostgreSqlAdapter
 - **Sqlite:** SqliteAdapter
+
+---
+
 
 ### 4. Example
 
@@ -113,17 +121,29 @@ Configuration provided in the `/migrations/postgresql_schema.sql` file.
 ##### 4.3.5 Sqlite as cache
 Configuration provided in the `/migrations/sqlite_schema.sqlite` file.
 
+
+---
+
+
 ### 5. Quality
 
 To run the PHPUnit tests at the command line, go to the tests directory and issue phpunit.
 
 This library attempts to comply with PSR-1, PSR-2, and PSR-4. If you notice compliance oversights, please send a patch via pull request.
 
+
+---
+
+
 ### 6. Author
 Nil Portugués Calderó
 
  - <contact@nilportugues.com>
  - [http://nilportugues.com](http://nilportugues.com)
+
+
+---
+
 
 ### 7. License
 The code base is licensed under the MIT license.
