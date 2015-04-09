@@ -85,7 +85,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
      */
     protected function getCurlClient()
     {
-        return new Curl();
+        return new Curl($this->base, $this->baseUrl);
     }
 
     /**
@@ -147,7 +147,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
             if (false !== $response) {
                 $response = json_decode($response, true);
 
-                if (array_key_exists('ok', $response) && true == $response['ok']) {
+                if (array_key_exists('ok', $response) && true === $response['ok']) {
                     $this->setChain($key, $value, $ttl);
                 }
             }

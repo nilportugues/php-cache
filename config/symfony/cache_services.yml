@@ -3,64 +3,64 @@ imports:
 
 services:
     nil_portugues.cache.adapter.in_memory_adapter:
-    	class: NilPortugues\Cache\Adapter\InMemoryAdapter
+        class: NilPortugues\Cache\Adapter\InMemoryAdapter
 
     nil_portugues.cache.adapter.filesystem_adapter:
-    	class: NilPortugues\Cache\Adapter\FileSystemAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\FileSystemAdapter
+        arguments:
          - %filesystem.path%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.redis_adapter:
-    	class: NilPortugues\Cache\Adapter\RedisAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\RedisAdapter
+        arguments:
          - %redis%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.predis_adapter:
-    	class: NilPortugues\Cache\Adapter\PredisAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\PredisAdapter
+        arguments:
          - %redis%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.memcached_adapter:
-    	class: NilPortugues\Cache\Adapter\MemcachedAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\MemcachedAdapter
+        arguments:
          - %memcached.persistent_id%
          - %memcached.connections%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.mysql_adapter:
-    	class: NilPortugues\Cache\Adapter\MySqlAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\MySqlAdapter
+        arguments:
          - %mysql.connections%
          - %mysql.cache_table%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.postgresql_adapter:
-    	class: NilPortugues\Cache\Adapter\PostgreSqlAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\PostgreSqlAdapter
+        arguments:
          - %postgresql.connections%
          - %postgresql.cache_table%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.sqlite_adapter:
-    	class: NilPortugues\Cache\Adapter\SqliteAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\SqliteAdapter
+        arguments:
          - %sqlite.connections%
          - %sqlite.cache_table%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.sphinx_adapter:
-    	class: NilPortugues\Cache\Adapter\SphinxAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\SphinxAdapter
+        arguments:
          - %sphinx.connections%
          - %sphinx.cache_table%
          - @nil_portugues.cache.adapter.in_memory_adapter
 
     nil_portugues.cache.adapter.elastic_search_adapter:
-    	class: NilPortugues\Cache\Adapter\ElasticSearchAdapter
-    	arguments:
+        class: NilPortugues\Cache\Adapter\ElasticSearchAdapter
+        arguments:
          - %elastic.base_url%
          - %elastic.index_name%
          - @nil_portugues.cache.adapter.in_memory_adapter

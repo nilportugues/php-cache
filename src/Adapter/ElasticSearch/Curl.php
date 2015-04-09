@@ -17,6 +17,26 @@ namespace NilPortugues\Cache\Adapter\ElasticSearch;
 class Curl implements CurlClient
 {
     /**
+     * @var string
+     */
+    private $base;
+
+    /**
+     * @var string
+     */
+    private $baseUrl;
+
+    /**
+     * @param string $base
+     * @param string $baseUrl
+     */
+    public function __construct($base, $baseUrl)
+    {
+        $this->base = $base;
+        $this->baseUrl = $baseUrl;
+    }
+
+    /**
      * @return bool
      */
     public function cacheIndexExists()
@@ -38,6 +58,7 @@ class Curl implements CurlClient
     /**
      * @param       $base
      * @param array $createCache
+     * @return void
      */
     public function createCacheIndex($base, array $createCache)
     {
@@ -64,7 +85,7 @@ class Curl implements CurlClient
         if (false !== $response) {
             $response = json_decode($response, true);
 
-            if (true == $response['exists'] && $response['fields']['_ttl'] > 0) {
+            if (true === $response['exists'] && $response['fields']['_ttl'] > 0) {
                 return $response["_source"]['value'];
             }
         }
