@@ -9,12 +9,17 @@ php:
   - nightly
 
 matrix:
+  fast_finish: true
   allow_failures:
     - php: nightly
-  
+    
+before_install:
+  - /home/travis/.phpenv/versions/$(phpenv version-name)/bin/composer self-update
+  - sh -c "sudo mkdir vendor"
+  - sh -c "sudo mount -t tmpfs -o size=512M tmpfs vendor"
+    
 before_script:
-  - sudo apt-get install redis-server
-  - sudo bash ./tests/travis_phpredis.sh
+  - sh -c "echo 'extension = redis.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini"
   - alias composer="php -d zend.enable_gc=0 /usr/bin/composer"
   - composer require --dev satooshi/php-coveralls:dev-master
   - composer install
@@ -26,7 +31,10 @@ after_script:
 script: 
   - bin/phpunit --coverage-text
   - bin/phpunit-randomizer --order rand
-
+  
+services:
+    - redis-server
+    
 matrix:
      allow_failures:
          - php: nightly  
