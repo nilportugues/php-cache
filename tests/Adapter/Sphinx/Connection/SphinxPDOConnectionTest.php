@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Cache\Adapter\SQL\Connection;
+namespace NilPortugues\Tests\Cache\Adapter\Sphinx\Connection;
 
 use NilPortugues\Cache\Adapter\SQL\Connection\SphinxPDOConnection;
 

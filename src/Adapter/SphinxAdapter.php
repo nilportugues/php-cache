@@ -61,9 +61,9 @@ class SphinxAdapter extends AbstractAdapter
             )
         );
 
-        $sphinxId = $this->connection->lastInsertId();
-        
-        $stmt->bindParam(self::SPHINX_ID_PLACEHOLDER, $sphinxId+1, PDO::PARAM_STR);
+        $sphinxId = (int) $this->connection->lastInsertId()+1;
+
+        $stmt->bindParam(self::SPHINX_ID_PLACEHOLDER, $sphinxId, PDO::PARAM_STR);
         $stmt->bindParam(self::QUERY_ID_PLACEHOLDER, $key, PDO::PARAM_STR);
         $stmt->bindParam(self::QUERY_VALUE_PLACEHOLDER, $value, PDO::PARAM_STR);
         $calculatedTtl = $calculatedTtl->format('Y-m-d H:i:s');

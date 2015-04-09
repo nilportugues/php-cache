@@ -18,10 +18,6 @@ final class Cache implements CacheAdapter
      */
     private $namespace;
 
-    /**
-     * @var int
-     */
-    private $expires;
 
     /**
      * @param CacheAdapter $cache
@@ -32,7 +28,10 @@ final class Cache implements CacheAdapter
     {
         $this->cache = (null === $cache) ? new InMemoryAdapter() : $cache;
         $this->namespace = (empty($namespace)) ? '' : $namespace.".";
-        $this->expires = (int) $expires;
+
+        if (0 !== $expires) {
+            $this->defaultTtl($expires);
+        }
     }
 
     /**
@@ -52,7 +51,6 @@ final class Cache implements CacheAdapter
      */
     public function set($key, $value, $ttl = null)
     {
-        $ttl = (null === $ttl) ? $this->expires : $ttl;
         $this->cache->set($this->namespace.$key, $value, $ttl);
         return $this;
     }
@@ -66,7 +64,7 @@ final class Cache implements CacheAdapter
      */
     public function defaultTtl($ttl)
     {
-        // TODO: Implement defaultTtl() method.
+        return $this->cache->defaultTtl($ttl);
     }
 
     /**
@@ -76,7 +74,7 @@ final class Cache implements CacheAdapter
      */
     public function delete($key)
     {
-        // TODO: Implement delete() method.
+        $this->cache->delete($this->namespace.$key);
     }
 
     /**
@@ -86,7 +84,7 @@ final class Cache implements CacheAdapter
      */
     public function isAvailable()
     {
-        // TODO: Implement isAvailable() method.
+        return $this->cache->isAvailable();
     }
 
     /**
@@ -96,7 +94,7 @@ final class Cache implements CacheAdapter
      */
     public function isHit()
     {
-        // TODO: Implement isHit() method.
+        return $this->cache->isHit();
     }
 
     /**
@@ -106,7 +104,7 @@ final class Cache implements CacheAdapter
      */
     public function clear()
     {
-        // TODO: Implement clear() method.
+        return $this->cache->clear();
     }
 
     /**
@@ -116,6 +114,6 @@ final class Cache implements CacheAdapter
      */
     public function drop()
     {
-        // TODO: Implement drop() method.
+        return $this->cache->drop();
     }
 }
