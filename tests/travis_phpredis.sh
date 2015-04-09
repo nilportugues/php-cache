@@ -7,4 +7,4 @@ phpize
 ./configure
 make
 sudo make install
-phpenv config-add php_extensions.ini
+echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
