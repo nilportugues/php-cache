@@ -4,8 +4,7 @@
 [![Build Status](https://travis-ci.org/nilportugues/cache.png)](https://travis-ci.org/nilportugues/cache) [![Coverage Status](https://coveralls.io/repos/nilportugues/cache/badge.svg)](https://coveralls.io/r/nilportugues/cache) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nilportugues/cache/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nilportugues/cache/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/918cfa6d-997d-4e41-bdcb-d01970485074/mini.png)](https://insight.sensiolabs.com/projects/918cfa6d-997d-4e41-bdcb-d01970485074) [![Latest Stable Version](https://poser.pugx.org/nilportugues/cache/v/stable.svg)](https://packagist.org/packages/nilportugues/cache) [![Total Downloads](https://poser.pugx.org/nilportugues/cache/downloads.svg)](https://packagist.org/packages/nilportugues/cache) [![License](https://poser.pugx.org/nilportugues/cache/license.svg)](https://packagist.org/packages/nilportugues/cache) 
 
  
-Cache layer for PHP applications using the on the Chain of Responsability pattern.
-
+Cache layer for PHP applications capable of being used standalone or with the on the Chain of Responsability pattern.
 
 
 
@@ -20,6 +19,11 @@ php composer.phar require nilportugues/cache
 
 ### 2. Features
 
+- One cache class, many adapters.
+- All cache adapters can be used as standalone cache classes.
+- Opt-in to be used as a chain of caches.
+- Implementation normalizes all mechanisms and behaviours.
+- Ready to go configuration files for all adapters is provided in `config`and `migrations` directories.
 
 ---
 
