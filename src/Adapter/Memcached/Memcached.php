@@ -19,6 +19,11 @@ use \Memcached as MemcachedDriver;
 class Memcached implements MemcachedClient
 {
     /**
+     * @var \Memcached
+     */
+    private $memcached;
+
+    /**
      * @param       $persistentId
      * @param array $connections
      */

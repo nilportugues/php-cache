@@ -366,7 +366,8 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         );
 
         $now = new DateTime();
-        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $now->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        $now = $now->format('Y-m-d H:i:s');
+        $stmt->bindParam(self::QUERY_TTL_PLACEHOLDER, $now, PDO::PARAM_STR);
         $stmt->execute();
     }
 

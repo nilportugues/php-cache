@@ -58,7 +58,6 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     public function get($key)
     {
         $key       = (string)$key;
-        $value     = null;
         $this->hit = false;
 
         $inMemoryValue = $this->inMemoryAdapter->get($key);
