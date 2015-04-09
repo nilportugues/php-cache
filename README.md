@@ -34,15 +34,16 @@ Yet sometimes these are not available and other options should be considered, bu
 - **PostgreSql:** PostgreSqlAdapter
 - **Sqlite:** SqliteAdapter
 
-### 4. Usage
+### 4. Example
+
+    The more cache levels the slower the cache system will be, so leverage the cache to your needs. 
+    Maybe you don't need a fallback mechanism at all! This is just an example.
 
 **1st level cache**: Redis (PredisAdapter) is our main cache, in a dedicated server.
 
 **2nd level cache**: Memcached (MemcachedAdapter) as fallback mechanism, available in the same machine as our PHP script.
 
 **Application cache**: InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers.
-
-The more cache levels the slower the cache system will be, so leverage the cache to your needs. Maybe you don't need a fallback mechanism at all!
 
 
 #### 4.1. Configuration
