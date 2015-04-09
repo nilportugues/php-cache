@@ -14,7 +14,7 @@ matrix:
   
 before_script:
   - sudo apt-get install redis-server
-  - sudo bash travis_phpredis.sh
+  - sudo bash ./tests/travis_phpredis.sh
   - alias composer="php -d zend.enable_gc=0 /usr/bin/composer"
   - composer require --dev satooshi/php-coveralls:dev-master
   - composer install
