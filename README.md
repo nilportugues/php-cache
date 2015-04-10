@@ -116,18 +116,21 @@ For fetching, first it's checked if data is available in memory, if not, it's fe
 $db = $this->serviceContainer->get('database');
 $userCache = $serviceContainer->get('user_cache');
 
-$user = $user = $userCache->get(1);
+$userId = 1;
+$cacheKey = sprintf("user:id:%s", $userId);
+
+$user = $user = $userCache->get($cacheKey);
 if(null !== $user) {
   return $user;
 }
 
-$user = $db->findById(1);
-$userCache->set($user);
+$user = $db->findById($userId);
+$userCache->set($cacheKey, $user);
 
 return $user;
 ```
 
-And that's pretty much it. It just works.
+ And that's pretty much it. Notice how same key is used for the get and set methods.
 
 
 #### 4.3 Other configurations
