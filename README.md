@@ -53,7 +53,7 @@ Yet sometimes these are not available and other options should be considered, bu
 - **Sqlite:** SqliteAdapter
 
 ---
-### 4. Cache Interface
+### 4. Cache and CacheAdapter Interfaces
 
 These are all the public methods available for the Cache and all of its available adapters:
 
@@ -65,6 +65,11 @@ These are all the public methods available for the Cache and all of its availabl
  - **isHit()**: Check if value was found in the cache or not.
  - **clear()**: Clears all expired values from cache.
  - **drop()**:  Clears all values from the cache.
+
+#### 4.1 - CacheAdapter
+Allows all of the public methods defined in Cache Interface.
+
+Each CacheAdapter will have a custom constructor method due to its needs, but **last parameter is always a chainable value, being another CacheAdapter.**
 
 ---
 
@@ -111,7 +116,7 @@ $memcachedAdapter = new MemcachedAdapter(
 $predisRedisAdapter = new PredisAdapter(
     $parameters['redis'],
     $inMemoryAdapter,
-    $memcachedAdapter
+    $memcachedAdapter //here we're chaining the $memcachedAdapter
 );
 
 return [
