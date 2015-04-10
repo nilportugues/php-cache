@@ -69,11 +69,13 @@ Yet sometimes these are not available and other options should be considered, bu
 
 #### 4.1. Configuration
 
-Using a Service Container, such as Symfony2's or a simple array of services, define the chain:
+Using a Service Container, such as an array returning the services or a more popular solution such as Symfony's Service Container, build the caches.
+
+For this example, we'll be building two caches, **user_cache** and **image_cache**. Both use Predis as first level cache and a fallback to Memcached if Predis cannot establish a connection during runtime.
 
 ```php
 <?php
-include_once realpath(dirname(__FILE__)).'/../../vendor/autoload.php';
+include_once realpath(dirname(__FILE__)).'/vendor/autoload.php';
 
 use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\Adapter\MemcachedAdapter;
@@ -82,29 +84,50 @@ use NilPortugues\Cache\Cache;
 
 $parameters = include_once realpath(dirname(__FILE__)).'/cache_parameters.php';
 
+//App cache
 $inMemoryAdapter = new InMemoryAdapter();
 
-$predisRedisAdapter = new PredisAdapter(
-    $parameters['redis_servers'],
+//Second level
+$memcachedAdapter = new MemcachedAdapter(
+    $parameters['memcached']['persistent_id'],
+    $parameters['memcached']['connections'],
     $inMemoryAdapter
 );
-
-$memcachedAdapter = new MemcachedAdapter(
-    $parameters['memcached_servers']['persistent_id'],
-    $parameters['memcached_servers']['connections'],
-    $inMemoryAdapter
+//First level
+$predisRedisAdapter = new PredisAdapter(
+    $parameters['redis'],
+    $inMemoryAdapter,
+    $memcachedAdapter
 );
 
 return [
-    'cache.adapter.in_memory_adapter' => $inMemoryAdapter,
-    'cache.adapter.memcached_adapter' => $memcachedAdapter,
-    'cache.adapter.redis.predis_adapter' => $predisRedisAdapter,
-    'user_cache' => new Cache($predisRedisAdapter, 'user'),
-    'image_cache' => new Cache($predisRedisAdapter, 'image'),
+    'user_cache' => new Cache($predisRedisAdapter, 'user', 60*5), //60 seconds cache
+    'image_cache' => new Cache($predisRedisAdapter, 'image', 60*60), //1 hour cache
 ];
 ```
 
 #### 4.2. Usage
+
+Now, using a Service Container, we'll get the **user_cache** to fetch data, or add if it does not exist. This data will be stored in the caches. 
+
+For fetching, first it's checked if data is available in memory, if not, it's fetched from the data storage, added to the in memory cache and returned to the user.
+
+```php
+$db = $this->serviceContainer->get('database');
+$userCache = $serviceContainer->get('user_cache');
+
+$user = $user = $userCache->get(1);
+if(null !== $user) {
+  return $user;
+}
+
+$user = $db->findById(1);
+$userCache->set($user);
+
+return $user;
+```
+
+And that's pretty much it. It just works.
 
 
 #### 4.3 Other configurations
