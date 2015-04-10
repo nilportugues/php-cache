@@ -8,7 +8,7 @@ Cache layer for PHP applications capable of being used standalone or with the on
 
 
 
-### 1. Installation
+## 1. Installation
 
 The recommended way to install the Domain-driven design foundation package is through [Composer](http://getcomposer.org). Run the following command to install it:
 
@@ -17,7 +17,7 @@ php composer.phar require nilportugues/cache
 ```
 ---
 
-### 2. Features
+## 2. Features
 
 - One cache class, many adapters.
 - All cache adapters can be used as standalone cache classes.
@@ -28,32 +28,32 @@ php composer.phar require nilportugues/cache
 
 ---
 
-### 3. Drivers Available
+## 3. Drivers Available
 The package provides several implementations for a key-value cache. 
 
 The most sensitive choice is to make use of the Cache based adapters such as Redis and Memcached, which are the most performant and specialized.
 
 Yet sometimes these are not available and other options should be considered, but we got you covered.
 
-#### Cache based: 
+### Cache based: 
 - **Memcached:** MemcachedAdapter *(php5-memcached)*
 - **Redis:** RedisAdapter *(php5-redis)*, PredisAdapter *(Predis)*
 
-#### Full-text based:
+### Full-text based:
 - **SphinxQL:** SphinxAdapter
 - **ElasticSearch:** ElasticSearchAdapter
 
-#### System based:
+### System based:
 - **Memory:** InMemoryAdapter
 - **FileSystem:** FileSystemAdapter
 
-#### Database based:
+### Database based:
 - **MySQL:** MySqlAdapter
 - **PostgreSql:** PostgreSqlAdapter
 - **Sqlite:** SqliteAdapter
 
 ---
-### 4. Cache and CacheAdapter Interfaces
+## 4. Cache and CacheAdapter Interfaces
 
 These are all the public methods available for the Cache and all of its available adapters:
 
@@ -66,14 +66,14 @@ These are all the public methods available for the Cache and all of its availabl
  - **clear()**: Clears all expired values from cache.
  - **drop()**:  Clears all values from the cache.
 
-#### 4.1 - CacheAdapter
+### 4.1 - CacheAdapter
 Allows all of the public methods defined in Cache Interface.
 
 Each CacheAdapter will have a custom constructor method due to its needs, but **last parameter is always a chainable value, being another CacheAdapter.**
 
 ---
 
-### 5. Example
+## 5. Example
 
     The more cache levels the slower the cache system will be, so leverage the 
     cache to your needs. 
@@ -125,7 +125,7 @@ return [
 ];
 ```
 
-#### 5.2. Usage
+### 5.2. Usage
 
 Now, using a Service Container, we'll get the **user_cache** to fetch data, or add if it does not exist. This data will be stored in the caches. 
 
@@ -152,9 +152,9 @@ return $user;
  And that's pretty much it. Notice how same key is used for the get and set methods.
 
 
-#### 5.3 Other configurations
+### 5.3 Other configurations
 
-##### 5.3.1 ElasticSearch as cache
+#### 5.3.1 ElasticSearch as cache
 
 It is important that you configure your ElasticSearch by appending the following line to the **elasticsearch.yml** file:
 
@@ -166,23 +166,23 @@ Now restart the ElasticSearch daemon.
 
 If you're wondering where the cache index definition is, the creation of index is handled by the adapter on instantiation if it does not already exist.
 
-##### 5.3.2 Sphinx as cache
+#### 5.3.2 Sphinx as cache
 Configuration provided in the `/migrations/sphinx.conf` file.
 
-##### 5.3.3 MySQL as cache
+#### 5.3.3 MySQL as cache
 Configuration provided in the `/migrations/mysql_schema.sql` file.
 
-##### 5.3.4 Postgres as cache
+#### 5.3.4 Postgres as cache
 Configuration provided in the `/migrations/postgresql_schema.sql` file.
 
-##### 5.3.5 Sqlite as cache
+#### 5.3.5 Sqlite as cache
 Configuration provided in the `/migrations/sqlite_schema.sqlite` file.
 
 
 ---
 
 
-### 6. Quality
+## 6. Quality
 
 To run the PHPUnit tests at the command line, go to the tests directory and issue phpunit.
 
@@ -192,7 +192,7 @@ This library attempts to comply with PSR-1, PSR-2, and PSR-4. If you notice comp
 ---
 
 
-### 7. Author
+## 7. Author
 Nil Portugués Calderó
 
  - <contact@nilportugues.com>
@@ -202,6 +202,6 @@ Nil Portugués Calderó
 ---
 
 
-### 8. License
+## 8. License
 The code base is licensed under the MIT license.
 
