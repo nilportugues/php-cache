@@ -66,6 +66,8 @@ These are all the public methods available for the Cache and all of its availabl
  - **clear()**: Clears all expired values from cache.
  - **drop()**:  Clears all values from the cache.
 
+---
+
 ### 5. Example
 
     The more cache levels the slower the cache system will be, so leverage the 
