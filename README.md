@@ -53,9 +53,20 @@ Yet sometimes these are not available and other options should be considered, bu
 - **Sqlite:** SqliteAdapter
 
 ---
+### 4. Cache Interface
 
+These are all the public methods available for the Cache and all of its available adapters:
 
-### 4. Example
+ - **get($key)**: Get a value identified by $key.
+ - **set($key, $value, $ttl = 0)**: Set a value identified by $key and with an optional $ttl.
+ - **defaultTtl($ttl)**: Allows to set a default ttl value if none is provided for set()
+ - **delete($key)**: Delete a value identified by $key.
+ - **isAvailable()**: Checks the availability of the cache service.
+ - **isHit()**: Check if value was found in the cache or not.
+ - **clear()**: Clears all expired values from cache.
+ - **drop()**:  Clears all values from the cache.
+
+### 5. Example
 
     The more cache levels the slower the cache system will be, so leverage the 
     cache to your needs. 
@@ -68,7 +79,7 @@ Yet sometimes these are not available and other options should be considered, bu
 **Application cache**: InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers.
 
 
-#### 4.1. Configuration
+#### 5.1. Configuration
 
 Using a Service Container, such as an array returning the services or a more popular solution such as Symfony's Service Container, build the caches.
 
@@ -107,7 +118,7 @@ return [
 ];
 ```
 
-#### 4.2. Usage
+#### 5.2. Usage
 
 Now, using a Service Container, we'll get the **user_cache** to fetch data, or add if it does not exist. This data will be stored in the caches. 
 
@@ -134,9 +145,9 @@ return $user;
  And that's pretty much it. Notice how same key is used for the get and set methods.
 
 
-#### 4.3 Other configurations
+#### 5.3 Other configurations
 
-##### 4.3.1 ElasticSearch as cache
+##### 5.3.1 ElasticSearch as cache
 
 It is important that you configure your ElasticSearch by appending the following line to the **elasticsearch.yml** file:
 
@@ -148,23 +159,23 @@ Now restart the ElasticSearch daemon.
 
 If you're wondering where the cache index definition is, the creation of index is handled by the adapter on instantiation if it does not already exist.
 
-##### 4.3.2 Sphinx as cache
+##### 5.3.2 Sphinx as cache
 Configuration provided in the `/migrations/sphinx.conf` file.
 
-##### 4.3.3 MySQL as cache
+##### 5.3.3 MySQL as cache
 Configuration provided in the `/migrations/mysql_schema.sql` file.
 
-##### 4.3.4 Postgres as cache
+##### 5.3.4 Postgres as cache
 Configuration provided in the `/migrations/postgresql_schema.sql` file.
 
-##### 4.3.5 Sqlite as cache
+##### 5.3.5 Sqlite as cache
 Configuration provided in the `/migrations/sqlite_schema.sqlite` file.
 
 
 ---
 
 
-### 5. Quality
+### 6. Quality
 
 To run the PHPUnit tests at the command line, go to the tests directory and issue phpunit.
 
@@ -174,7 +185,7 @@ This library attempts to comply with PSR-1, PSR-2, and PSR-4. If you notice comp
 ---
 
 
-### 6. Author
+### 7. Author
 Nil Portugués Calderó
 
  - <contact@nilportugues.com>
@@ -184,6 +195,6 @@ Nil Portugués Calderó
 ---
 
 
-### 7. License
+### 8. License
 The code base is licensed under the MIT license.
 
