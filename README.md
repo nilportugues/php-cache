@@ -23,7 +23,8 @@ php composer.phar require nilportugues/cache
 - All cache adapters can be used as standalone cache classes.
 - Opt-in to be used as a chain of caches.
 - Implementation normalizes all mechanisms and behaviours.
-- Ready to go configuration files for all adapters is provided in `config`and `migrations` directories.
+- Configuration files for all adapters in vanilla PHP and Symfony2 format provided in `config`and `migrations` directories.
+- High quality, 100% tested code.
 
 ---
 
