@@ -114,7 +114,7 @@ For fetching, first it's checked if data is available in memory, if not, it's fe
 
 ```php
 $db = $this->serviceContainer->get('database');
-$userCache = $serviceContainer->get('user_cache');
+$userCache = $this->serviceContainer->get('user_cache');
 
 $userId = 1;
 $cacheKey = sprintf("user:id:%s", $userId);
