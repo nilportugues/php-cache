@@ -138,7 +138,7 @@ $userCache = $this->serviceContainer->get('user_cache');
 $userId = 1;
 $cacheKey = sprintf("user:id:%s", $userId);
 
-$user = $user = $userCache->get($cacheKey);
+$user = $userCache->get($cacheKey);
 if(null !== $user) {
   return $user;
 }
