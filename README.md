@@ -10,7 +10,7 @@ Cache layer for PHP applications capable of being used standalone or with the Ch
 
 ## 1. Installation
 
-The recommended way to install the Domain-driven design foundation package is through [Composer](http://getcomposer.org). Run the following command to install it:
+The recommended way to install this package is through [Composer](http://getcomposer.org). Run the following command to install it:
 
 ```sh
 php composer.phar require nilportugues/cache
