@@ -120,7 +120,7 @@ $predisRedisAdapter = new PredisAdapter(
 );
 
 return [
-    'user_cache' => new Cache($predisRedisAdapter, 'user', 60*5), //60 seconds cache
+    'user_cache' => new Cache($predisRedisAdapter, 'user', 60*5), //5 minutes cache
     'image_cache' => new Cache($predisRedisAdapter, 'image', 60*60), //1 hour cache
 ];
 ```
