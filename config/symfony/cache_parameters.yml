@@ -1,6 +1,6 @@
 parameters:
     filesystem:
-        path: null/tmp"
+        path: /tmp
 
     redis:
         cache1 :
