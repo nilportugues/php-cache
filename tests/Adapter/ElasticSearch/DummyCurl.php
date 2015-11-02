@@ -42,7 +42,7 @@ class DummyCurl implements CurlClient
     {
         $this->registry = $this->registry = [
             'already.cached.value' => [
-                'value' => serialize(1),
+                'value' => \serialize(1),
                 'ttl' => new DateTime()
             ]
         ];
@@ -55,7 +55,7 @@ class DummyCurl implements CurlClient
      */
     public function get($key)
     {
-        if (true === array_key_exists($key, $this->registry)) {
+        if (true === \array_key_exists($key, $this->registry)) {
             if ($this->registry[$key]['ttl'] >= new DateTime()) {
                 return $this->registry[$key]['value'];
             }
@@ -72,7 +72,7 @@ class DummyCurl implements CurlClient
      */
     public function delete($key)
     {
-        if (true === array_key_exists($key, $this->registry)) {
+        if (true === \array_key_exists($key, $this->registry)) {
             unset($this->registry[$key]);
         }
     }
@@ -89,10 +89,10 @@ class DummyCurl implements CurlClient
 
         $this->registry[$key] = [
             'value' => $value,
-            'ttl' => new DateTime(date('Y-m-d H:i:s', strtotime(sprintf('now +%s seconds', $ttl))))
+            'ttl' => new DateTime(\date('Y-m-d H:i:s', \strtotime(\sprintf('now +%s seconds', $ttl))))
         ];
 
-        return json_encode($response);
+        return \json_encode($response);
     }
 
     /**

@@ -36,6 +36,6 @@ class SqlitePDOConnection extends AbstractPDOConnection
      */
     protected function buildDSNString(array &$parameters)
     {
-        return str_replace(self::PATH."=", '', parent::buildDSNString($parameters));
+        return \str_replace(self::PATH."=", '', parent::buildDSNString($parameters));
     }
 }

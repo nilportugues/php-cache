@@ -59,7 +59,7 @@ class DummyPDO extends PDO
     public function __construct()
     {
         $this->registry['already.cached'] = [
-            AbstractAdapter::TABLE_CACHE_VALUE => serialize(10),
+            AbstractAdapter::TABLE_CACHE_VALUE => \serialize(10),
             AbstractAdapter::TABLE_CACHE_TTL => '2025-01-01 10:10:10'
         ];
     }
@@ -103,9 +103,9 @@ class DummyPDO extends PDO
      */
     public function prepare($statement, $options = null)
     {
-        $queryParts = explode(' ', $statement);
-        $queryParts = array_reverse($queryParts);
-        $queryAction = array_pop($queryParts);
+        $queryParts = \explode(' ', $statement);
+        $queryParts = \array_reverse($queryParts);
+        $queryAction = \array_pop($queryParts);
 
         $this->query = $queryAction;
 
@@ -185,7 +185,7 @@ class DummyPDO extends PDO
     {
         $value = [];
 
-        if (true === array_key_exists($this->getCacheId(), $this->registry)) {
+        if (true === \array_key_exists($this->getCacheId(), $this->registry)) {
             $value = $this->registry[$this->getCacheId()];
         }
 
@@ -215,7 +215,7 @@ class DummyPDO extends PDO
     public function clear()
     {
         $now = new DateTime();
-        foreach (array_keys($this->registry) as $key) {
+        foreach (\array_keys($this->registry) as $key) {
             $ttl = new DateTime($this->registry[$key][AbstractAdapter::TABLE_CACHE_TTL]);
 
             if ($ttl < $now) {

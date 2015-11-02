@@ -64,10 +64,10 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         $indexName = (string)$indexName;
         $this->curl = $this->getCurlClient();
 
-        $this->base    = sprintf("%s/%s", $baseUrl, $indexName);
-        $this->baseUrl = sprintf("%s/%s/cache", $baseUrl, $indexName);
+        $this->base    = \sprintf("%s/%s", $baseUrl, $indexName);
+        $this->baseUrl = \sprintf("%s/%s/cache", $baseUrl, $indexName);
 
-        if (false === filter_var($this->base, FILTER_VALIDATE_URL)) {
+        if (false === \filter_var($this->base, FILTER_VALIDATE_URL)) {
             throw new InvalidArgumentException('The provided base URL is not a valid URL');
         }
 
@@ -145,9 +145,9 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
             $response = $this->curl->set($key, $this->storageDataStructure($value), $ttl);
 
             if (false !== $response) {
-                $response = json_decode($response, true);
+                $response = \json_decode($response, true);
 
-                if (array_key_exists('ok', $response) && true === $response['ok']) {
+                if (\array_key_exists('ok', $response) && true === $response['ok']) {
                     $this->setChain($key, $value, $ttl);
                 }
             }

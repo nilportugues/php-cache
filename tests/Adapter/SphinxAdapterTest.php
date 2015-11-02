@@ -111,7 +111,7 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
         $this->cache->set('cached.value.key', 1, 1);
         $this->inMemoryAdapter->drop();
 
-        sleep(2); //Not a bug, Wait for 2 seconds.
+        \sleep(2); //Not a bug, Wait for 2 seconds.
         $this->assertEquals(null, $this->cache->get('cached.value.key'));
         $this->assertFalse($this->cache->isHit());
     }
@@ -126,7 +126,7 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $this->cache->get('cached.value.key2'));
 
 
-        sleep(2); //Not a bug, Wait for 2 seconds.
+        \sleep(2); //Not a bug, Wait for 2 seconds.
         $this->cache->clear();
         $this->assertEquals(null, $this->cache->get('cached.value.key1'));
         $this->assertEquals(null, $this->cache->get('cached.value.key2'));

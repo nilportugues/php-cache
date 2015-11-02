@@ -31,17 +31,17 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;
 
-        $cacheDir = realpath($cacheDir);
+        $cacheDir = \realpath($cacheDir);
 
-        if (false === is_dir($cacheDir)) {
+        if (false === \is_dir($cacheDir)) {
             throw new InvalidArgumentException(
-                sprintf('The provided path %s is not a valid directory', $cacheDir)
+                \sprintf('The provided path %s is not a valid directory', $cacheDir)
             );
         }
 
-        if (false === is_writable($cacheDir)) {
+        if (false === \is_writable($cacheDir)) {
             throw new InvalidArgumentException(
-                sprintf('The provided directory %s is not writable', $cacheDir)
+                \sprintf('The provided directory %s is not writable', $cacheDir)
             );
         }
 
@@ -68,8 +68,8 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
 
         $fileKey = $this->getFilenameFromCacheKey($key);
 
-        if (true === file_exists($fileKey)) {
-            $value = $this->restoreDataStructure(file_get_contents($fileKey));
+        if (true === \file_exists($fileKey)) {
+            $value = $this->restoreDataStructure(\file_get_contents($fileKey));
             if ($value['expires'] >= (new DateTime())) {
                 $this->hit = true;
                 $this->inMemoryAdapter->set($key, $value['value'], 0);
@@ -104,11 +104,11 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function getDirectoryHash($key)
     {
-        $key = md5($key);
+        $key = \md5($key);
 
-        $level1 = substr($key, 0, 1);
-        $level2 = substr($key, 1, 1);
-        $level3 = substr($key, 2, 1);
+        $level1 = \substr($key, 0, 1);
+        $level2 = \substr($key, 1, 1);
+        $level3 = \substr($key, 2, 1);
 
         $directoryHash = $level1 . DIRECTORY_SEPARATOR . $level2 . DIRECTORY_SEPARATOR . $level3;
         $this->createCacheHashDirectory($directoryHash);
@@ -122,8 +122,8 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     private function createCacheHashDirectory($directoryHash)
     {
         $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . $directoryHash;
-        if (false === file_exists($cacheDir)) {
-            mkdir($cacheDir, 0755, true);
+        if (false === \file_exists($cacheDir)) {
+            \mkdir($cacheDir, 0755, true);
         }
     }
 
@@ -134,7 +134,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function removeCacheFile($fileKey)
     {
-        unlink($fileKey);
+        \unlink($fileKey);
     }
 
     /**
@@ -153,7 +153,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         if ($ttl >= 0) {
             $calculatedTtl = $this->getCalculatedTtl($ttl);
             $data          = $this->buildDataCache($value, $calculatedTtl);
-            file_put_contents($this->getFilenameFromCacheKey($key), $data);
+            \file_put_contents($this->getFilenameFromCacheKey($key), $data);
             $this->setChain($key, $value, $ttl);
         }
 
@@ -167,10 +167,10 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function getCalculatedTtl($ttl)
     {
-        $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
+        $calculatedTtl = \strtotime(\sprintf('now +%s seconds', $ttl));
 
         if (0 == $ttl) {
-            $calculatedTtl = strtotime('now +10 years');
+            $calculatedTtl = \strtotime('now +10 years');
         }
         return $calculatedTtl;
     }
@@ -186,7 +186,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         return $this->storageDataStructure(
             [
                 'value'   => $value,
-                'expires' => new DateTime(date('Y-m-d H:i:s', $calculatedTtl))
+                'expires' => new DateTime(\date('Y-m-d H:i:s', $calculatedTtl))
             ]
         );
     }
@@ -202,7 +202,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
     {
         $fileKey = $this->getFilenameFromCacheKey($key);
 
-        if (true === file_exists($fileKey)) {
+        if (true === \file_exists($fileKey)) {
             $this->removeCacheFile($fileKey);
         }
 
@@ -216,7 +216,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     public function isAvailable()
     {
-        return file_exists($this->cacheDir) && is_dir($this->cacheDir) && is_writable($this->cacheDir);
+        return \file_exists($this->cacheDir) && \is_dir($this->cacheDir) && \is_writable($this->cacheDir);
     }
 
     /**
@@ -235,11 +235,11 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function clearCacheFiles($directory)
     {
-        foreach (glob("{$directory}/*") as $file) {
-            if (is_dir($file)) {
+        foreach (\glob("{$directory}/*") as $file) {
+            if (\is_dir($file)) {
                 $this->clearCacheFiles($file);
             } else {
-                $value = $this->restoreDataStructure(file_get_contents($file));
+                $value = $this->restoreDataStructure(\file_get_contents($file));
                 if ($value['expires'] < (new DateTime())) {
                     $this->removeCacheFile($file);
                 }
@@ -263,8 +263,8 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
      */
     private function removeCacheFiles($directory)
     {
-        foreach (glob("{$directory}/*") as $file) {
-            if (is_dir($file)) {
+        foreach (\glob("{$directory}/*") as $file) {
+            if (\is_dir($file)) {
                 $this->removeCacheFiles($file);
             } else {
                 $this->removeCacheFile($file);

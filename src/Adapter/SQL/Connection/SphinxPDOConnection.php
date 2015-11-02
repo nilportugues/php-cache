@@ -34,7 +34,7 @@ class SphinxPDOConnection extends AbstractPDOConnection
      */
     protected function buildDSNString(array &$parameters)
     {
-        if (array_key_exists(self::UNIX_SOCKET, $parameters)) {
+        if (\array_key_exists(self::UNIX_SOCKET, $parameters)) {
             return self::UNIX_SOCKET."=".$parameters[self::UNIX_SOCKET];
         }
         return parent::buildDSNString($parameters);

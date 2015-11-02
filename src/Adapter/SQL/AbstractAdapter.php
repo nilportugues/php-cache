@@ -90,9 +90,9 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function checkMandatoryParameterFields(array &$parameters)
     {
         foreach ($this->requiredKeys as $key) {
-            if (false === array_key_exists($key, $parameters)) {
+            if (false === \array_key_exists($key, $parameters)) {
                 throw new InvalidArgumentException(
-                    sprintf("Parameter '%s' is required to set up a connection.", $key)
+                    \sprintf("Parameter '%s' is required to set up a connection.", $key)
                 );
             }
         }
@@ -161,7 +161,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     {
         try {
             $stmt = $this->connection->prepare(
-                sprintf(
+                \sprintf(
                     'SELECT %s, %s FROM %s WHERE %s = %s',
                     self::TABLE_CACHE_VALUE,
                     self::TABLE_CACHE_TTL,
@@ -175,7 +175,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return (is_bool($result)) ? [] : $result;
+            return (\is_bool($result)) ? [] : $result;
         } catch (PDOException $e) {
             return [];
         }
@@ -198,7 +198,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function deleteFromDatabase($key)
     {
         $stmt = $this->connection->prepare(
-            sprintf(
+            \sprintf(
                 'DELETE FROM %s WHERE %s = %s',
                 $this->cacheTableName,
                 self::TABLE_CACHE_ID,
@@ -235,9 +235,9 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
      */
     protected function getCalculatedTtl($ttl)
     {
-        $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
+        $calculatedTtl = \strtotime(\sprintf('now +%s seconds', $ttl));
         if (0 == $ttl) {
-            $calculatedTtl = strtotime('now +10 years');
+            $calculatedTtl = \strtotime('now +10 years');
         }
         return $calculatedTtl;
     }
@@ -254,7 +254,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         $value = $this->storageDataStructure($value);
 
         $calculatedTtl = $this->fromDefaultTtl($ttl);
-        $calculatedTtl = new DateTime(date('Y-m-d H:i:s', $this->getCalculatedTtl($calculatedTtl)));
+        $calculatedTtl = new DateTime(\date('Y-m-d H:i:s', $this->getCalculatedTtl($calculatedTtl)));
 
         $databaseValue = $this->getFromDatabase($key);
         if (false === empty($databaseValue)) {
@@ -263,7 +263,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
         }
 
         $stmt = $this->connection->prepare(
-            sprintf(
+            \sprintf(
                 'INSERT INTO %s(%s, %s, %s) VALUES(%s, %s, %s)',
                 $this->cacheTableName,
                 self::TABLE_CACHE_ID,
@@ -293,7 +293,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function updateToDatabase($key, $value, DateTime $ttl)
     {
         $stmt = $this->connection->prepare(
-            sprintf(
+            \sprintf(
                 'UPDATE %s SET %s = %s, %s = %s, %s = %s WHERE %s = %s',
                 $this->cacheTableName,
                 self::TABLE_CACHE_ID,
@@ -327,7 +327,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
 
         try {
             $this->connection->exec(
-                sprintf(
+                \sprintf(
                     'SELECT %s FROM %s LIMIT 1',
                     self::TABLE_CACHE_ID,
                     $this->cacheTableName
@@ -357,7 +357,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function clearFromDatabase()
     {
         $stmt = $this->connection->prepare(
-            sprintf(
+            \sprintf(
                 'DELETE FROM %s WHERE %s < %s',
                 $this->cacheTableName,
                 self::TABLE_CACHE_TTL,
@@ -388,7 +388,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected function dropFromDatabase()
     {
         $stmt = $this->connection->prepare(
-            sprintf('DELETE FROM %s', $this->cacheTableName)
+            \sprintf('DELETE FROM %s', $this->cacheTableName)
         );
 
         $stmt->execute();

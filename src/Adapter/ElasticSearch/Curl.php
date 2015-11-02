@@ -41,15 +41,15 @@ class Curl implements CurlClient
      */
     public function cacheIndexExists()
     {
-        $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, sprintf("{$this->base}/%s", '_settings'));
-        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+        $curlHandler = \curl_init();
+        \curl_setopt($curlHandler, CURLOPT_URL, \sprintf("{$this->base}/%s", '_settings'));
+        \curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
 
-        $response = curl_exec($curlHandler);
+        $response = \curl_exec($curlHandler);
 
         if (false !== $response) {
-            $response = json_decode($response, true);
-            return array_key_exists('index_name', $response);
+            $response = \json_decode($response, true);
+            return \array_key_exists('index_name', $response);
         }
 
         return false;
@@ -62,11 +62,11 @@ class Curl implements CurlClient
      */
     public function createCacheIndex($base, array $createCache)
     {
-        $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, $base);
-        curl_setopt($curlHandler, CURLOPT_POST, true);
-        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, json_encode($createCache));
-        curl_exec($curlHandler);
+        $curlHandler = \curl_init();
+        \curl_setopt($curlHandler, CURLOPT_URL, $base);
+        \curl_setopt($curlHandler, CURLOPT_POST, true);
+        \curl_setopt($curlHandler, CURLOPT_POSTFIELDS, \json_encode($createCache));
+        \curl_exec($curlHandler);
     }
 
 
@@ -79,11 +79,11 @@ class Curl implements CurlClient
     {
         $curlHandler = $this->curlHandler($key.'?fields=_source,_ttl');
 
-        $response = curl_exec($curlHandler);
-        curl_close($curlHandler);
+        $response = \curl_exec($curlHandler);
+        \curl_close($curlHandler);
 
         if (false !== $response) {
-            $response = json_decode($response, true);
+            $response = \json_decode($response, true);
 
             if (true === $response['exists'] && $response['fields']['_ttl'] > 0) {
                 return $response["_source"]['value'];
@@ -101,10 +101,10 @@ class Curl implements CurlClient
      */
     public function curlHandler($key)
     {
-        $curlHandler = curl_init();
+        $curlHandler = \curl_init();
 
-        curl_setopt($curlHandler, CURLOPT_URL, sprintf("{$this->baseUrl}/%s", $key));
-        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+        \curl_setopt($curlHandler, CURLOPT_URL, \sprintf("{$this->baseUrl}/%s", $key));
+        \curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
 
         return $curlHandler;
     }
@@ -115,10 +115,10 @@ class Curl implements CurlClient
     public function delete($key)
     {
         $curlHandler = $this->curlHandler($key);
-        curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
+        \curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
 
-        curl_exec($curlHandler);
-        curl_close($curlHandler);
+        \curl_exec($curlHandler);
+        \curl_close($curlHandler);
     }
 
 
@@ -133,12 +133,12 @@ class Curl implements CurlClient
     {
         $curlHandler = $this->curlHandler($key . '?ttl=' . $ttl . 's');
 
-        curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlHandler, CURLOPT_POST, true);
-        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, $value);
+        \curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
+        \curl_setopt($curlHandler, CURLOPT_POST, true);
+        \curl_setopt($curlHandler, CURLOPT_POSTFIELDS, $value);
 
-        $response = curl_exec($curlHandler);
-        curl_close($curlHandler);
+        $response = \curl_exec($curlHandler);
+        \curl_close($curlHandler);
         return $response;
     }
 
@@ -148,9 +148,9 @@ class Curl implements CurlClient
      */
     public function drop($base)
     {
-        $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, $base);
-        curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_exec($curlHandler);
+        $curlHandler = \curl_init();
+        \curl_setopt($curlHandler, CURLOPT_URL, $base);
+        \curl_setopt($curlHandler, CURLOPT_CUSTOMREQUEST, "DELETE");
+        \curl_exec($curlHandler);
     }
 }

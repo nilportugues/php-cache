@@ -31,7 +31,7 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function get($key)
     {
-        if (true === array_key_exists($key, $this->registry)) {
+        if (true === \array_key_exists($key, $this->registry)) {
             if ($this->registry[$key]['ttl'] >= new DateTime()) {
                 return $this->registry[$key]['value'];
             }
@@ -50,7 +50,7 @@ class DummyMemcachedClient implements MemcachedClient
     {
         $this->registry[$key] = [
             'value' => $value,
-            'ttl' => new DateTime(date('Y-m-d H:i:s', strtotime(sprintf('now +10 years'))))
+            'ttl' => new DateTime(\date('Y-m-d H:i:s', \strtotime(\sprintf('now +10 years'))))
         ];
     }
 
@@ -60,9 +60,9 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function touch($key, $expiration)
     {
-        if (true === array_key_exists($key, $this->registry)) {
+        if (true === \array_key_exists($key, $this->registry)) {
             $this->registry[$key]['ttl'] = new DateTime(
-                date('Y-m-d H:i:s', strtotime(sprintf('now +s seconds', $expiration)))
+                \date('Y-m-d H:i:s', \strtotime(\sprintf('now +s seconds', $expiration)))
             );
         }
     }
@@ -74,7 +74,7 @@ class DummyMemcachedClient implements MemcachedClient
      */
     public function delete($key)
     {
-        if (true === array_key_exists($key, $this->registry)) {
+        if (true === \array_key_exists($key, $this->registry)) {
             unset($this->registry[$key]);
         }
     }

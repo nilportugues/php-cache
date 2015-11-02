@@ -69,9 +69,9 @@ abstract class AbstractPDOConnection
      */
     public function __construct(array $parameters, $username = null, $password = null, array $driverOptions = [])
     {
-        if (false === array_key_exists(self::DATABASE, $parameters)) {
+        if (false === \array_key_exists(self::DATABASE, $parameters)) {
             throw new InvalidArgumentException(
-                sprintf("Parameter array requires of '%s' data to be set.", self::DATABASE)
+                \sprintf("Parameter array requires of '%s' data to be set.", self::DATABASE)
             );
         }
 
@@ -81,7 +81,7 @@ abstract class AbstractPDOConnection
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new InvalidArgumentException(
-                sprintf("An exception occurred in %s: %s", get_class($this), $e->getMessage())
+                \sprintf("An exception occurred in %s: %s", \get_class($this), $e->getMessage())
             );
         }
     }
@@ -104,11 +104,11 @@ abstract class AbstractPDOConnection
     {
         $dsn = [];
         foreach ($this->keys as $keyName) {
-            if (array_key_exists($keyName, $parameters) && strlen($parameters[$keyName]) > 0) {
+            if (\array_key_exists($keyName, $parameters) && \strlen($parameters[$keyName]) > 0) {
                 $dsn[] = "{$keyName}={$parameters[$keyName]}";
             }
         }
 
-        return implode(";", $dsn);
+        return \implode(";", $dsn);
     }
 }

@@ -38,7 +38,7 @@ class SphinxAdapter extends AbstractAdapter
         $value = $this->storageDataStructure($value);
 
         $calculatedTtl = $this->fromDefaultTtl($ttl);
-        $calculatedTtl = new DateTime(date('Y-m-d H:i:s', $this->getCalculatedTtl($calculatedTtl)));
+        $calculatedTtl = new DateTime(\date('Y-m-d H:i:s', $this->getCalculatedTtl($calculatedTtl)));
 
         $databaseValue = $this->getFromDatabase($key);
         if (false === empty($databaseValue)) {
@@ -48,7 +48,7 @@ class SphinxAdapter extends AbstractAdapter
         }
 
         $stmt = $this->connection->prepare(
-            sprintf(
+            \sprintf(
                 'INSERT INTO %s(id,%s,%s,%s) VALUES(%s,%s,%s,%s)',
                 $this->cacheTableName,
                 self::TABLE_CACHE_ID,
@@ -83,7 +83,7 @@ class SphinxAdapter extends AbstractAdapter
     protected function updateToDatabase($key, $value, DateTime $ttl)
     {
         $stmt = $this->connection->prepare(
-            sprintf(
+            \sprintf(
                 'REPLACE INTO %s(id, %s, %s, %s) VALUES(%s, %s, %s, %s)',
                 $this->cacheTableName,
                 self::TABLE_CACHE_ID,
@@ -116,7 +116,7 @@ class SphinxAdapter extends AbstractAdapter
     {
         try {
             $stmt = $this->connection->prepare(
-                sprintf(
+                \sprintf(
                     'SELECT id, %s, %s FROM %s WHERE %s = %s',
                     self::TABLE_CACHE_VALUE,
                     self::TABLE_CACHE_TTL,
@@ -130,7 +130,7 @@ class SphinxAdapter extends AbstractAdapter
             $stmt->execute();
 
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return (is_bool($result)) ? [] : $result;
+            return (\is_bool($result)) ? [] : $result;
         } catch (PDOException $e) {
             return [];
         }

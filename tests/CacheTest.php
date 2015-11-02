@@ -37,7 +37,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
     public function testItShouldSetExpires()
     {
         $cache = new Cache(new InMemoryAdapter(), 'user', 1);
-        sleep(1);
+        \sleep(1);
         $this->assertEquals(null, $cache->get('some.key'));
     }
 
@@ -64,7 +64,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $this->cache->set('some.key', 1, 1);
         $this->assertEquals(1, $this->cache->get('some.key'));
 
-        sleep(2);
+        \sleep(2);
         $this->cache->clear();
         $this->assertEquals(null, $this->cache->get('some.key'));
     }

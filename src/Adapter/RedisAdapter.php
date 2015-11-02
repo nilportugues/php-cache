@@ -25,7 +25,7 @@ class RedisAdapter extends AbstractAdapter
         $this->isRedisExtensionAvailable();
 
         try {
-            $connections = array_values($connections);
+            $connections = \array_values($connections);
             $this->connected = true;
 
             $this->redis = new Redis();
@@ -63,9 +63,9 @@ class RedisAdapter extends AbstractAdapter
      */
     private function isRedisExtensionAvailable()
     {
-        if (false === class_exists('\Redis')) {
+        if (false === \class_exists('\Redis')) {
             throw new \Exception(
-                sprintf(
+                \sprintf(
                     'Redis extension for PHP is not installed on the system, use %s class instead.',
                     '\NilPortugues\Cache\Adapter\PredisAdapter'
                 )

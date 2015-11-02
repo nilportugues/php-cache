@@ -30,7 +30,7 @@ class DummyRedisClient
     {
         $this->redis = [
             'already.cached.value' => [
-                'value' => serialize(1),
+                'value' => \serialize(1),
                 'ttl' => new DateTime('2215-04-04 11:38:25'),
             ],
         ];
@@ -43,7 +43,7 @@ class DummyRedisClient
      */
     public function get($key)
     {
-        if (array_key_exists($key, $this->redis)) {
+        if (\array_key_exists($key, $this->redis)) {
             if ($this->redis[$key]['ttl'] >= (new DateTime())) {
                 return $this->redis[$key]['value'];
             }
@@ -59,11 +59,11 @@ class DummyRedisClient
      */
     public function set($key, $value)
     {
-        $ttl = strtotime(sprintf('now +%s seconds', 0));
+        $ttl = \strtotime(\sprintf('now +%s seconds', 0));
 
         $this->redis[$key] = [
             'value' => $value,
-            'ttl' => new DateTime(date('Y-m-d H:i:s', $ttl))
+            'ttl' => new DateTime(\date('Y-m-d H:i:s', $ttl))
         ];
     }
 
@@ -73,8 +73,8 @@ class DummyRedisClient
      */
     public function expire($key, $ttl)
     {
-        $ttl = strtotime(sprintf('now +%s seconds', $ttl));
-        $this->redis[$key]['ttl'] = new DateTime(date('Y-m-d H:i:s', $ttl));
+        $ttl = \strtotime(\sprintf('now +%s seconds', $ttl));
+        $this->redis[$key]['ttl'] = new DateTime(\date('Y-m-d H:i:s', $ttl));
     }
 
     /**
@@ -82,7 +82,7 @@ class DummyRedisClient
      */
     public function del($key)
     {
-        if (array_key_exists($key, $this->redis)) {
+        if (\array_key_exists($key, $this->redis)) {
             unset($this->redis[$key]);
         }
     }

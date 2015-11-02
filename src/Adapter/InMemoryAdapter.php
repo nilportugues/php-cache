@@ -29,7 +29,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
         $value     = null;
         $this->hit = false;
 
-        if (array_key_exists($key, $this->registry)) {
+        if (\array_key_exists($key, $this->registry)) {
             if ($this->registry[$key]['expires'] >= (new DateTime())) {
                 $this->hit = true;
                 return $this->restoreDataStructure($key);
@@ -48,10 +48,10 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     protected function restoreDataStructure($key)
     {
         if ($this->isSerializedArray($key)) {
-            return unserialize($this->registry[$key]['value']);
+            return \unserialize($this->registry[$key]['value']);
         }
 
-        return (is_object($this->registry[$key]['value'])) ?
+        return (\is_object($this->registry[$key]['value'])) ?
             clone $this->registry[$key]['value'] :
             $this->registry[$key]['value'];
     }
@@ -63,11 +63,11 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     private function isSerializedArray($key)
     {
-        return is_string($this->registry[$key]['value'])
-        && 'a:' === substr($this->registry[$key]['value'], 0, 2)
-        && '}' === substr($this->registry[$key]['value'], -1)
-        && (':{i:' === substr($this->registry[$key]['value'], 3, 4)
-            || ':{s:' === substr($this->registry[$key]['value'], 3, 4));
+        return \is_string($this->registry[$key]['value'])
+        && 'a:' === \substr($this->registry[$key]['value'], 0, 2)
+        && '}' === \substr($this->registry[$key]['value'], -1)
+        && (':{i:' === \substr($this->registry[$key]['value'], 3, 4)
+            || ':{s:' === \substr($this->registry[$key]['value'], 3, 4));
     }
 
     /**
@@ -89,7 +89,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
 
             $this->registry[$key] = [
                 'value'   => $this->storageDataStructure($value),
-                'expires' => new DateTime(date('Y-m-d H:i:s', $calculatedTtl))
+                'expires' => new DateTime(\date('Y-m-d H:i:s', $calculatedTtl))
             ];
         }
         return $this;
@@ -102,9 +102,9 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     private function getCalculatedTtl($ttl)
     {
-        $calculatedTtl = strtotime(sprintf('now +%s seconds', $ttl));
+        $calculatedTtl = \strtotime(\sprintf('now +%s seconds', $ttl));
         if (0 == $ttl) {
-            $calculatedTtl = strtotime('now +10 years');
+            $calculatedTtl = \strtotime('now +10 years');
         }
         return $calculatedTtl;
     }
@@ -116,11 +116,11 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     protected function storageDataStructure($value)
     {
-        if (is_array($value)) {
-            return serialize($value);
+        if (\is_array($value)) {
+            return \serialize($value);
         }
 
-        return (is_object($value)) ? clone $value : $value;
+        return (\is_object($value)) ? clone $value : $value;
     }
 
     /**
@@ -134,7 +134,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     {
         $key = (string)$key;
 
-        if (array_key_exists($key, $this->registry)) {
+        if (\array_key_exists($key, $this->registry)) {
             unset($this->registry[$key]);
         }
         return $this;
@@ -158,7 +158,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     public function clear()
     {
         $currentDate = new DateTime();
-        foreach (array_keys($this->registry) as $key) {
+        foreach (\array_keys($this->registry) as $key) {
             $this->clearExpiredKey($key, $currentDate);
         }
     }

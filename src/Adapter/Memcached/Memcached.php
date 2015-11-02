@@ -36,7 +36,7 @@ class Memcached implements MemcachedClient
 
         $this->memcached->setOption(
             MemcachedDriver::OPT_SERIALIZER,
-            (defined(MemcachedDriver::HAVE_IGBINARY) && MemcachedDriver::HAVE_IGBINARY)
+            (\defined(MemcachedDriver::HAVE_IGBINARY) && MemcachedDriver::HAVE_IGBINARY)
                 ? MemcachedDriver::SERIALIZER_IGBINARY : MemcachedDriver::SERIALIZER_PHP
         );
 
@@ -52,7 +52,7 @@ class Memcached implements MemcachedClient
      */
     private function isMemcachedExtensionAvailable()
     {
-        if (false === class_exists('\Memcached')) {
+        if (false === \class_exists('\Memcached')) {
             throw new \Exception('Memcached extension for PHP is not installed on the system.');
         }
     }

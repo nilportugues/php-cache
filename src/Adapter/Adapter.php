@@ -59,7 +59,7 @@ abstract class Adapter implements CacheAdapter
      */
     public function defaultTtl($ttl)
     {
-        if (false === is_numeric($ttl) || $ttl<0) {
+        if (false === \is_numeric($ttl) || $ttl<0) {
             throw new \InvalidArgumentException('A TTL value must be a positive integer value');
         }
 
@@ -89,7 +89,7 @@ abstract class Adapter implements CacheAdapter
      */
     protected function storageDataStructure($value)
     {
-        return serialize($value);
+        return \serialize($value);
     }
 
     /**
@@ -99,7 +99,7 @@ abstract class Adapter implements CacheAdapter
      */
     protected function restoreDataStructure($value)
     {
-        return unserialize($value);
+        return \unserialize($value);
     }
 
     /**

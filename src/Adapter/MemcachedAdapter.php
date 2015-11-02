@@ -24,7 +24,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
      */
     public function __construct($persistentId, array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
     {
-        $this->memcached       = $this->getMemcachedClient($persistentId, array_unique(array_values($connections)));
+        $this->memcached       = $this->getMemcachedClient($persistentId, \array_unique(\array_values($connections)));
         $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter     = ($inMemory === $next) ? null : $next;
     }
@@ -87,7 +87,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
             $this->memcached->set($key, $value);
 
             if ($ttl > 0) {
-                $this->memcached->touch($key, time() + $ttl);
+                $this->memcached->touch($key, \time() + $ttl);
             }
 
             $this->setChain($key, $value, $ttl);
