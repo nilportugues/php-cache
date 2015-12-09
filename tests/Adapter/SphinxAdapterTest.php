@@ -40,8 +40,8 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $this->nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $this->nextAdapter = InMemoryAdapter::getInstance();
         $connection = [
             'user'     => '',
             'password' => '',
@@ -65,8 +65,8 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testItWillThrowInvalidArgumentException()
     {
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $this->nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $this->nextAdapter = InMemoryAdapter::getInstance();
         $connection = [];
 
         $this->setExpectedException('InvalidArgumentException');

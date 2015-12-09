@@ -32,8 +32,8 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $this->nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $this->nextAdapter = InMemoryAdapter::getInstance();
         $connections = [
             'host' => '127.0.0.1',
             'port' => 11211,

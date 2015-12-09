@@ -14,7 +14,33 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     /**
      * @var array
      */
-    private $registry = [];
+    private static $registry = [];
+
+    /**
+     * @var self Reference to singleton instance
+     */
+    private static $instance;
+
+    /**
+     * is not allowed to call from outside: private!
+     *
+     */
+    protected function __construct()
+    {
+    }
+
+    /**
+     * gets the instance via lazy initialization (created on first usage)
+     *
+     * @return self
+     */
+    public static function getInstance()
+    {
+        if (null === static::$instance) {
+            static::$instance = new static;
+        }
+        return static::$instance;
+    }
 
     /**
      * Get a value identified by $key.
@@ -29,12 +55,12 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
         $value     = null;
         $this->hit = false;
 
-        if (\array_key_exists($key, $this->registry)) {
-            if ($this->registry[$key]['expires'] >= (new DateTime())) {
+        if (\array_key_exists($key, self::$registry)) {
+            if (self::$registry[$key]['expires'] >= (new DateTime())) {
                 $this->hit = true;
                 return $this->restoreDataStructure($key);
             }
-            unset($this->registry[$key]);
+            unset(self::$registry[$key]);
         }
 
         return $value;
@@ -48,12 +74,12 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     protected function restoreDataStructure($key)
     {
         if ($this->isSerializedArray($key)) {
-            return \unserialize($this->registry[$key]['value']);
+            return \unserialize(self::$registry[$key]['value']);
         }
 
-        return (\is_object($this->registry[$key]['value'])) ?
-            clone $this->registry[$key]['value'] :
-            $this->registry[$key]['value'];
+        return (\is_object(self::$registry[$key]['value'])) ?
+            clone self::$registry[$key]['value'] :
+            self::$registry[$key]['value'];
     }
 
     /**
@@ -63,11 +89,11 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     private function isSerializedArray($key)
     {
-        return \is_string($this->registry[$key]['value'])
-        && 'a:' === \substr($this->registry[$key]['value'], 0, 2)
-        && '}' === \substr($this->registry[$key]['value'], -1)
-        && (':{i:' === \substr($this->registry[$key]['value'], 3, 4)
-            || ':{s:' === \substr($this->registry[$key]['value'], 3, 4));
+        return \is_string(self::$registry[$key]['value'])
+        && 'a:' === \substr(self::$registry[$key]['value'], 0, 2)
+        && '}' === \substr(self::$registry[$key]['value'], -1)
+        && (':{i:' === \substr(self::$registry[$key]['value'], 3, 4)
+            || ':{s:' === \substr(self::$registry[$key]['value'], 3, 4));
     }
 
     /**
@@ -87,7 +113,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
         if ($ttl >= 0) {
             $calculatedTtl = $this->getCalculatedTtl($ttl);
 
-            $this->registry[$key] = [
+            self::$registry[$key] = [
                 'value'   => $this->storageDataStructure($value),
                 'expires' => new DateTime(\date('Y-m-d H:i:s', $calculatedTtl))
             ];
@@ -134,8 +160,8 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     {
         $key = (string)$key;
 
-        if (\array_key_exists($key, $this->registry)) {
-            unset($this->registry[$key]);
+        if (\array_key_exists($key, self::$registry)) {
+            unset(self::$registry[$key]);
         }
         return $this;
     }
@@ -158,7 +184,7 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
     public function clear()
     {
         $currentDate = new DateTime();
-        foreach (\array_keys($this->registry) as $key) {
+        foreach (\array_keys(self::$registry) as $key) {
             $this->clearExpiredKey($key, $currentDate);
         }
     }
@@ -171,8 +197,8 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     private function clearExpiredKey($key, DateTime $dateTime)
     {
-        if ($this->registry[$key]['expires'] < $dateTime) {
-            unset($this->registry[$key]);
+        if (self::$registry[$key]['expires'] < $dateTime) {
+            unset(self::$registry[$key]);
         }
     }
 
@@ -183,6 +209,24 @@ class InMemoryAdapter extends Adapter implements CacheAdapter
      */
     public function drop()
     {
-        $this->registry = [];
+        self::$registry = [];
+    }
+
+    /**
+     * prevent the instance from being cloned
+     *
+     * @return void
+     */
+    protected function __clone()
+    {
+    }
+
+    /**
+     * prevent from being unserialized
+     *
+     * @return void
+     */
+    protected function __wakeup()
+    {
     }
 }

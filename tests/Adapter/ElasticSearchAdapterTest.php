@@ -39,8 +39,8 @@ class ElasticSearchAdapterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $this->nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $this->nextAdapter = InMemoryAdapter::getInstance();
         $baseUrl = 'http://localhost:9200';
 
         $this->cache = new DummyElasticSearchAdapter($baseUrl, 'cache', $this->inMemoryAdapter, $this->nextAdapter);

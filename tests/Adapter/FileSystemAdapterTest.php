@@ -37,8 +37,8 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
         }
         \mkdir($cacheDir);
 
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $nextAdapter = InMemoryAdapter::getInstance();
 
         $this->cache = new FileSystemAdapter($cacheDir, $this->inMemoryAdapter, $nextAdapter);
     }
@@ -56,8 +56,8 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItThrowsExceptionWhenCacheDirDoesNotExist()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $nextAdapter = InMemoryAdapter::getInstance();
 
         new FileSystemAdapter('./a', $this->inMemoryAdapter, $nextAdapter);
     }
@@ -66,8 +66,8 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItThrowsExceptionWhenCacheDirIsNotADirectory()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $nextAdapter = InMemoryAdapter::getInstance();
 
         new FileSystemAdapter(__FILE__, $this->inMemoryAdapter, $nextAdapter);
     }
@@ -76,8 +76,8 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItThrowsExceptionWhenCacheDirIsNotWritable()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $this->inMemoryAdapter = new InMemoryAdapter();
-        $nextAdapter = new InMemoryAdapter();
+        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
+        $nextAdapter = InMemoryAdapter::getInstance();
 
         new FileSystemAdapter('/', $this->inMemoryAdapter, $nextAdapter);
     }

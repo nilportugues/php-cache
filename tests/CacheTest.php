@@ -26,7 +26,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->cache = new Cache(new InMemoryAdapter(), 'user');
+        $this->cache = new Cache(InMemoryAdapter::getInstance(), 'user');
     }
 
     protected function tearDown()
@@ -36,7 +36,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldSetExpires()
     {
-        $cache = new Cache(new InMemoryAdapter(), 'user', 1);
+        $cache = new Cache(InMemoryAdapter::getInstance(), 'user', 1);
         \sleep(1);
         $this->assertEquals(null, $cache->get('some.key'));
     }

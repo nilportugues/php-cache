@@ -21,7 +21,7 @@ class InMemoryAdapterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->cache = new InMemoryAdapter();
+        $this->cache = InMemoryAdapter::getInstance();
     }
     
     protected function tearDown()
