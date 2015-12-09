@@ -20,10 +20,6 @@ use NilPortugues\Tests\Cache\Adapter\Sphinx\DummyAdapter;
  */
 class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var InMemoryAdapter
-     */
-    protected $inMemoryAdapter;
 
     /**
      * @var InMemoryAdapter
@@ -40,7 +36,6 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $this->nextAdapter = InMemoryAdapter::getInstance();
         $connection = [
             'user'     => '',
@@ -52,7 +47,7 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->cache = new DummyAdapter($connection, 'cache', $this->inMemoryAdapter, $this->nextAdapter);
+        $this->cache = new DummyAdapter($connection, 'cache', $this->nextAdapter);
     }
 
     protected function tearDown()
@@ -65,12 +60,11 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
      */
     public function testItWillThrowInvalidArgumentException()
     {
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $this->nextAdapter = InMemoryAdapter::getInstance();
         $connection = [];
 
         $this->setExpectedException('InvalidArgumentException');
-        $this->cache = new SphinxAdapter($connection, '__cache', $this->inMemoryAdapter, $this->nextAdapter);
+        $this->cache = new SphinxAdapter($connection, '__cache', $this->nextAdapter);
     }
 
     public function testItIsAvailable()
@@ -109,7 +103,7 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItCanGetAndReturnsValueFromFileSystemAndWillExpire()
     {
         $this->cache->set('cached.value.key', 1, 1);
-        $this->inMemoryAdapter->drop();
+        InMemoryAdapter::getInstance()->drop();
 
         \sleep(2); //Not a bug, Wait for 2 seconds.
         $this->assertEquals(null, $this->cache->get('cached.value.key'));
@@ -145,7 +139,7 @@ class SphinxAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItWillReturnEmptyForGetIfException()
     {
         $this->forceDummyPDOConnectionToFireExceptions();
-        $this->inMemoryAdapter->drop();
+        InMemoryAdapter::getInstance()->drop();
 
         $this->assertEquals(null, $this->cache->get('cached.value.key'));
     }

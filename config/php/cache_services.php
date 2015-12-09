@@ -18,30 +18,25 @@ $parameters = include_once realpath(dirname(__FILE__)).'/cache_parameters.php';
 /******************************************************
  * Caching in system memory or disk
  ******************************************************/
-$inMemoryAdapter = new InMemoryAdapter();
 
 $fileSystemAdapter = new FileSystemAdapter(
-    $parameters['filesystem']['path'],
-    $inMemoryAdapter
+    $parameters['filesystem']['path']
 );
 
 /*******************************************************
  * Caching using cache systems
  ******************************************************/
 $nativeRedisAdapter = new RedisAdapter(
-    $parameters['redis'],
-    $inMemoryAdapter
+    $parameters['redis']
 );
 
 $predisRedisAdapter = new PredisAdapter(
-    $parameters['redis'],
-    $inMemoryAdapter
+    $parameters['redis']
 );
 
 $memcachedAdapter = new MemcachedAdapter(
     $parameters['memcached']['persistent_id'],
-    $parameters['memcached']['connections'],
-    $inMemoryAdapter
+    $parameters['memcached']['connections']
 );
 
 /*******************************************************
@@ -49,20 +44,17 @@ $memcachedAdapter = new MemcachedAdapter(
  ******************************************************/
 $mysqlAdapter = new MySqlAdapter(
     $parameters['mysql']['connections'],
-    $parameters['mysql']['cache_table'],
-    $inMemoryAdapter
+    $parameters['mysql']['cache_table']
 );
 
 $postgresqlAdapter = new PostgreSqlAdapter(
     $parameters['postgresql']['connections'],
-    $parameters['postgresql']['cache_table'],
-    $inMemoryAdapter
+    $parameters['postgresql']['cache_table']
 );
 
 $sqliteAdapter = new SqliteAdapter(
     $parameters['sqlite']['connections'],
-    $parameters['sqlite']['cache_table'],
-    $inMemoryAdapter
+    $parameters['sqlite']['cache_table']
 );
 
 /*******************************************************
@@ -70,18 +62,16 @@ $sqliteAdapter = new SqliteAdapter(
  ******************************************************/
 $sphinxAdapter = new SphinxAdapter(
     $parameters['sphinx']['connections'],
-    $parameters['sphinx']['cache_table'],
-    $inMemoryAdapter
+    $parameters['sphinx']['cache_table']
 );
 
 $elasticSearchAdapter = new ElasticSearchAdapter(
     $parameters['elastic']['base_url'],
-    $parameters['elastic']['index_name'],
-    $inMemoryAdapter
+    $parameters['elastic']['index_name']
 );
 
 return [
-    'nil_portugues.cache.adapter.in_memory_adapter' => $inMemoryAdapter,
+    'nil_portugues.cache.adapter.in_memory_adapter' => InMemoryAdapter::getInstance(),
     'nil_portugues.cache.adapter.file_system_adapter' => $fileSystemAdapter,
     'nil_portugues.cache.adapter.redis.native_adapter' => $nativeRedisAdapter,
     'nil_portugues.cache.adapter.redis.predis_adapter' => $predisRedisAdapter,

@@ -20,17 +20,14 @@ use NilPortugues\Cache\Adapter\PredisAdapter;
 class PredisAdapterTest extends \PHPUnit_Framework_TestCase
 {
     private $nextAdapter;
-    private $inMemoryAdapter;
 
     protected function setUp()
     {
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $this->nextAdapter = InMemoryAdapter::getInstance();
     }
 
     protected function tearDown()
     {
-        $this->inMemoryAdapter = null;
         $this->nextAdapter = null;
     }
 
@@ -40,7 +37,7 @@ class PredisAdapterTest extends \PHPUnit_Framework_TestCase
             ['host' => '255.0.0.0', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1']
         ];
 
-        $cache = new PredisAdapter($connections, $this->inMemoryAdapter, $this->nextAdapter);
+        $cache = new PredisAdapter($connections, $this->nextAdapter);
         $this->assertFalse($cache->isAvailable());
     }
 }

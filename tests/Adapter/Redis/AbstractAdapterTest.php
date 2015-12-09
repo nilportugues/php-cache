@@ -29,9 +29,8 @@ class AbstractAdapterTest extends \PHPUnit_Framework_TestCase
             ['host' => '255.0.0.0', 'port'=> 6379, 'database'=> 1, 'alias'=> 'cache1', 'timeout' => 1]
         ];
 
-        $inMemoryAdapter = InMemoryAdapter::getInstance();
         $nextAdapter = InMemoryAdapter::getInstance();
-        $this->cache = new DummyAdapter($connections, $inMemoryAdapter, $nextAdapter);
+        $this->cache = new DummyAdapter($connections, $nextAdapter);
     }
 
     protected function tearDown()

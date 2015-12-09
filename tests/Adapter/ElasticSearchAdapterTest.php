@@ -22,11 +22,6 @@ class ElasticSearchAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @var InMemoryAdapter
      */
-    protected $inMemoryAdapter;
-
-    /**
-     * @var InMemoryAdapter
-     */
     protected $nextAdapter;
 
     /**
@@ -39,11 +34,10 @@ class ElasticSearchAdapterTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $this->nextAdapter = InMemoryAdapter::getInstance();
         $baseUrl = 'http://localhost:9200';
 
-        $this->cache = new DummyElasticSearchAdapter($baseUrl, 'cache', $this->inMemoryAdapter, $this->nextAdapter);
+        $this->cache = new DummyElasticSearchAdapter($baseUrl, 'cache', $this->nextAdapter);
     }
 
     /**
@@ -59,7 +53,7 @@ class ElasticSearchAdapterTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('InvalidArgumentException');
 
         $baseUrl = 'AAAA';
-        new DummyElasticSearchAdapter($baseUrl, 'cache', $this->inMemoryAdapter, $this->nextAdapter);
+        new DummyElasticSearchAdapter($baseUrl, 'cache', $this->nextAdapter);
     }
 
     public function testItCanGetAndReturnsNull()

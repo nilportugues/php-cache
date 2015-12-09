@@ -26,7 +26,7 @@ final class Cache implements CacheAdapter
      */
     public function __construct(CacheAdapter $cache = null, $namespace = '', $expires = 0)
     {
-        $this->cache = (null === $cache) ? new InMemoryAdapter() : $cache;
+        $this->cache = (null === $cache) ? InMemoryAdapter::getInstance() : $cache;
         $this->namespace = (empty($namespace)) ? '' : $namespace.".";
 
         if (0 !== $expires) {

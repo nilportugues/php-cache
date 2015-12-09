@@ -79,11 +79,14 @@ Each CacheAdapter will have a custom constructor method due to its needs, but **
     cache to your needs. 
     Maybe you don't need a fallback mechanism at all! This is just an example.
 
-**1st level cache**: Redis (PredisAdapter) is our main cache, in a dedicated server.
+**1st level cache**
+Redis (PredisAdapter) is our main cache, in a dedicated server.
 
-**2nd level cache**: Memcached (MemcachedAdapter) as fallback mechanism, available in the same machine as our PHP script.
+**2nd level cache**
+Memcached (MemcachedAdapter) as fallback mechanism, available in the same machine as our PHP script.
 
-**Application cache**: InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers.
+**Application cache**
+InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers. This comes enabled by default so you don't need to worry at all and is shared among all layers.
 
 
 #### 5.1. Configuration
@@ -96,32 +99,24 @@ For this example, we'll be building two caches, **user_cache** and **image_cache
 <?php
 include_once realpath(dirname(__FILE__)).'/vendor/autoload.php';
 
-use NilPortugues\Cache\Adapter\InMemoryAdapter;
 use NilPortugues\Cache\Adapter\MemcachedAdapter;
 use NilPortugues\Cache\Adapter\PredisAdapter;
 use NilPortugues\Cache\Cache;
 
 $parameters = include_once realpath(dirname(__FILE__)).'/cache_parameters.php';
 
-//App cache
-$inMemoryAdapter = new InMemoryAdapter();
-
-//Second level
-$memcachedAdapter = new MemcachedAdapter(
-    $parameters['memcached']['persistent_id'],
-    $parameters['memcached']['connections'],
-    $inMemoryAdapter
-);
-//First level
-$predisRedisAdapter = new PredisAdapter(
+$cache = new PredisAdapter(
     $parameters['redis'],
-    $inMemoryAdapter,
-    $memcachedAdapter //here we're chaining the $memcachedAdapter
+    //here we're chaining the $memcachedAdapter
+    new MemcachedAdapter(
+        $parameters['memcached']['persistent_id'],
+        $parameters['memcached']['connections']
+    );
 );
 
 return [
-    'user_cache' => new Cache($predisRedisAdapter, 'user', 60*5), //5 minutes cache
-    'image_cache' => new Cache($predisRedisAdapter, 'image', 60*60), //1 hour cache
+    'user_cache' => new Cache($cache, 'user', 60*5), //5 minutes cache
+    'image_cache' => new Cache($cache, 'image', 60*60), //1 hour cache
 ];
 ```
 
@@ -133,18 +128,18 @@ For fetching, first it's checked if data is available in memory, if not, it's fe
 
 ```php
 $db = $this->serviceContainer->get('database');
-$userCache = $this->serviceContainer->get('user_cache');
+$cache = $this->serviceContainer->get('cache');
 
 $userId = 1;
 $cacheKey = sprintf("user:id:%s", $userId);
 
-$user = $userCache->get($cacheKey);
+$user = $cache->get($cacheKey);
 if(null !== $user) {
   return $user;
 }
 
 $user = $db->findById($userId);
-$userCache->set($cacheKey, $user);
+$cache->set($cacheKey, $user);
 
 return $user;
 ```

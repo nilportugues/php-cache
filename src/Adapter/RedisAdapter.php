@@ -15,12 +15,11 @@ class RedisAdapter extends AbstractAdapter
 {
     /**
      * @param array           $connections
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      *
      * @throws \Exception
      */
-    public function __construct(array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct(array $connections, CacheAdapter $next = null)
     {
         $this->isRedisExtensionAvailable();
 
@@ -35,8 +34,7 @@ class RedisAdapter extends AbstractAdapter
             $this->connected = false;
         }
 
-        $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = ($inMemory === $next) ? null: $next;
+        $this->nextAdapter     = (InMemoryAdapter::getInstance() === $next) ? null: $next;
     }
 
 

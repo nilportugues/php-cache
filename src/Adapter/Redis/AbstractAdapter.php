@@ -33,11 +33,15 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     protected $connected;
 
     /**
+     * @var InMemoryAdapter
+     */
+    protected $inMemoryAdapter;
+
+    /**
      * @param array           $connections
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      */
-    abstract public function __construct(array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null);
+    abstract public function __construct(array $connections, CacheAdapter $next = null);
 
     /**
      * Get a value identified by $key.
@@ -50,9 +54,9 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     {
         $this->hit = false;
 
-        $inMemoryValue = $this->inMemoryAdapter->get($key);
+        $inMemoryValue = InMemoryAdapter::getInstance()->get($key);
 
-        if ($this->inMemoryAdapter->isHit()) {
+        if (InMemoryAdapter::getInstance()->isHit()) {
             $this->hit = true;
             return $inMemoryValue;
         }
@@ -63,7 +67,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
             if ($value) {
                 $this->hit = true;
                 $value     = $this->restoreDataStructure($value);
-                $this->inMemoryAdapter->set($key, $value, 0);
+                InMemoryAdapter::getInstance()->set($key, $value, 0);
                 return $value;
             }
         }

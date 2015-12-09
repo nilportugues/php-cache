@@ -24,11 +24,6 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
      */
     private $cache;
 
-    /**
-     * @var InMemoryAdapter
-     */
-    private $inMemoryAdapter;
-
     public function setUp()
     {
         $cacheDir = \realpath(\dirname(__FILE__)).'/tmp';
@@ -37,10 +32,9 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
         }
         \mkdir($cacheDir);
 
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $nextAdapter = InMemoryAdapter::getInstance();
 
-        $this->cache = new FileSystemAdapter($cacheDir, $this->inMemoryAdapter, $nextAdapter);
+        $this->cache = new FileSystemAdapter($cacheDir, $nextAdapter);
     }
 
     public function tearDown()
@@ -56,30 +50,27 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItThrowsExceptionWhenCacheDirDoesNotExist()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $nextAdapter = InMemoryAdapter::getInstance();
 
-        new FileSystemAdapter('./a', $this->inMemoryAdapter, $nextAdapter);
+        new FileSystemAdapter('./a', $nextAdapter);
     }
 
 
     public function testItThrowsExceptionWhenCacheDirIsNotADirectory()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $nextAdapter = InMemoryAdapter::getInstance();
 
-        new FileSystemAdapter(__FILE__, $this->inMemoryAdapter, $nextAdapter);
+        new FileSystemAdapter(__FILE__, $nextAdapter);
     }
 
 
     public function testItThrowsExceptionWhenCacheDirIsNotWritable()
     {
         $this->setExpectedException('InvalidArgumentException');
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $nextAdapter = InMemoryAdapter::getInstance();
 
-        new FileSystemAdapter('/', $this->inMemoryAdapter, $nextAdapter);
+        new FileSystemAdapter('/', $nextAdapter);
     }
 
     public function testItCanGetAndReturnsNull()
@@ -109,7 +100,7 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItCanGetAndReturnsValueFromFileSystemWithTtl()
     {
         $this->cache->set('cached.value.key', 1, 1000);
-        $this->inMemoryAdapter->drop();
+        InMemoryAdapter::getInstance()->drop();
 
         $this->assertEquals(1, $this->cache->get('cached.value.key'));
         $this->assertTrue($this->cache->isHit());
@@ -118,7 +109,7 @@ class FileSystemAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItCanGetAndReturnsValueFromFileSystemAndWillExpire()
     {
         $this->cache->set('cached.value.key', 1, 1);
-        $this->inMemoryAdapter->drop();
+        InMemoryAdapter::getInstance()->drop();
 
         \sleep(2); //Not a bug, Wait for 2 seconds.
         $this->assertEquals(null, $this->cache->get('cached.value.key'));

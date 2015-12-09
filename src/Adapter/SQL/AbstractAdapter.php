@@ -68,18 +68,16 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     /**
      * @param array           $connection
      * @param string          $tableName
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      */
-    public function __construct(array $connection, $tableName, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct(array $connection, $tableName, CacheAdapter $next = null)
     {
         $this->checkMandatoryParameterFields($connection);
         $this->parameters     = $connection;
         $this->connection     = $this->getConnection();
         $this->cacheTableName = $tableName;
 
-        $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
+        $this->nextAdapter     = (InMemoryAdapter::getInstance() === $next) ? null : $next;
     }
 
     /**
@@ -129,8 +127,8 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
     {
         $this->hit = false;
 
-        $inMemoryValue = $this->inMemoryAdapter->get($key);
-        if ($this->inMemoryAdapter->isHit()) {
+        $inMemoryValue = InMemoryAdapter::getInstance()->get($key);
+        if (InMemoryAdapter::getInstance()->isHit()) {
             $this->hit = true;
             return $inMemoryValue;
         }
@@ -143,7 +141,7 @@ abstract class AbstractAdapter extends Adapter implements CacheAdapter
             if ($ttl >= new DateTime()) {
                 $this->hit = true;
                 $value     = $this->restoreDataStructure($result[self::CACHE_VALUE]);
-                $this->inMemoryAdapter->set($key, $value, 0);
+                InMemoryAdapter::getInstance()->set($key, $value, 0);
                 return $value;
             }
             $this->delete($key);

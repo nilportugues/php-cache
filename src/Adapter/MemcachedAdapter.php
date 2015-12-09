@@ -19,14 +19,12 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     /**
      * @param string          $persistentId
      * @param array           $connections
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      */
-    public function __construct($persistentId, array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct($persistentId, array $connections, CacheAdapter $next = null)
     {
         $this->memcached       = $this->getMemcachedClient($persistentId, \array_unique(\array_values($connections)));
-        $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
+        $this->nextAdapter     = (InMemoryAdapter::getInstance() === $next) ? null : $next;
     }
 
     /**
@@ -52,9 +50,9 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
     {
         $this->hit = false;
 
-        $inMemoryValue = $this->inMemoryAdapter->get($key);
+        $inMemoryValue = InMemoryAdapter::getInstance()->get($key);
 
-        if ($this->inMemoryAdapter->isHit()) {
+        if (InMemoryAdapter::getInstance()->isHit()) {
             $this->hit = true;
             return $inMemoryValue;
         }
@@ -63,7 +61,7 @@ class MemcachedAdapter extends Adapter implements CacheAdapter
 
         if ($value) {
             $this->hit = true;
-            $this->inMemoryAdapter->set($key, $value, 0);
+            InMemoryAdapter::getInstance()->set($key, $value, 0);
             return $value;
         }
 

@@ -21,15 +21,13 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
 
     /**
      * @param string          $cacheDir
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($cacheDir, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct($cacheDir, CacheAdapter $next = null)
     {
-        $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
+        $this->nextAdapter     = (InMemoryAdapter::getInstance() === $next) ? null : $next;
 
         $cacheDir = \realpath($cacheDir);
 
@@ -60,8 +58,8 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
         $key       = (string)$key;
         $this->hit = false;
 
-        $inMemoryValue = $this->inMemoryAdapter->get($key);
-        if ($this->inMemoryAdapter->isHit()) {
+        $inMemoryValue = InMemoryAdapter::getInstance()->get($key);
+        if (InMemoryAdapter::getInstance()->isHit()) {
             $this->hit = true;
             return $inMemoryValue;
         }
@@ -72,7 +70,7 @@ class FileSystemAdapter extends Adapter implements CacheAdapter
             $value = $this->restoreDataStructure(\file_get_contents($fileKey));
             if ($value['expires'] >= (new DateTime())) {
                 $this->hit = true;
-                $this->inMemoryAdapter->set($key, $value['value'], 0);
+                InMemoryAdapter::getInstance()->set($key, $value['value'], 0);
                 return $value['value'];
             }
             $this->removeCacheFile($fileKey);

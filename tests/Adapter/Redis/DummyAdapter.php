@@ -22,12 +22,10 @@ class DummyAdapter extends AbstractAdapter
 {
     /**
      * @param array           $connections
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      */
-    public function __construct(array $connections, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct(array $connections, CacheAdapter $next = null)
     {
-        $this->inMemoryAdapter = $inMemory;
         $this->nextAdapter = $next;
         $this->redis = new DummyRedisClient();
     }

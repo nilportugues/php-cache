@@ -53,12 +53,11 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
     /**
      * @param string          $baseUrl
      * @param string          $indexName
-     * @param InMemoryAdapter $inMemory
      * @param CacheAdapter    $next
      *
      * @throws InvalidArgumentException
      */
-    public function __construct($baseUrl, $indexName, InMemoryAdapter $inMemory, CacheAdapter $next = null)
+    public function __construct($baseUrl, $indexName, CacheAdapter $next = null)
     {
         $baseUrl   = (string)$baseUrl;
         $indexName = (string)$indexName;
@@ -75,8 +74,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
             $this->curl->createCacheIndex($this->base, $this->createCache);
         }
 
-        $this->inMemoryAdapter = $inMemory;
-        $this->nextAdapter     = ($inMemory === $next) ? null : $next;
+        $this->nextAdapter = (InMemoryAdapter::getInstance() === $next) ? null : $next;
     }
 
     /**
@@ -100,8 +98,8 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
         $key       = (string)$key;
         $this->hit = false;
 
-        $inMemoryValue = $this->inMemoryAdapter->get($key);
-        if ($this->inMemoryAdapter->isHit()) {
+        $inMemoryValue = InMemoryAdapter::getInstance()->get($key);
+        if (InMemoryAdapter::getInstance()->isHit()) {
             $this->hit = true;
             return $inMemoryValue;
         }
@@ -110,7 +108,7 @@ class ElasticSearchAdapter extends Adapter implements CacheAdapter
 
         if (null !== $value) {
             $this->hit = true;
-            $this->inMemoryAdapter->set($key, $value, 0);
+            InMemoryAdapter::getInstance()->set($key, $value, 0);
             return $this->restoreDataStructure($value);
         }
 

@@ -18,11 +18,6 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @var InMemoryAdapter
      */
-    protected $inMemoryAdapter;
-
-    /**
-     * @var InMemoryAdapter
-     */
     protected $nextAdapter;
 
     /**
@@ -32,7 +27,6 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->inMemoryAdapter = InMemoryAdapter::getInstance();
         $this->nextAdapter = InMemoryAdapter::getInstance();
         $connections = [
             'host' => '127.0.0.1',
@@ -40,7 +34,7 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
             'weight' => 1
         ];
 
-        $this->cache = new DummyMemcachedAdapter('__cache', [$connections], $this->inMemoryAdapter, $this->nextAdapter);
+        $this->cache = new DummyMemcachedAdapter('__cache', [$connections], $this->nextAdapter);
         $this->cache->drop();
     }
 
@@ -69,7 +63,7 @@ class MemcachedAdapterTest extends \PHPUnit_Framework_TestCase
     public function testItCanGetAndReturnsValueWithoutTtl()
     {
         $this->cache->set('cached.value.key', 1);
-        $this->inMemoryAdapter->drop();
+        InMemoryAdapter::getInstance()->drop();
 
         $this->assertEquals(1, $this->cache->get('cached.value.key'));
         $this->assertTrue($this->cache->isHit());

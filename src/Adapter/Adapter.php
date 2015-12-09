@@ -33,11 +33,6 @@ abstract class Adapter implements CacheAdapter
      */
     protected $nextAdapter;
 
-    /**
-     * @var InMemoryAdapter
-     */
-    protected $inMemoryAdapter;
-
 
     /**
      * Check if value was found in the cache or not.
@@ -107,7 +102,7 @@ abstract class Adapter implements CacheAdapter
      */
     protected function clearChain()
     {
-        $this->inMemoryAdapter->clear();
+        InMemoryAdapter::getInstance()->clear();
 
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->clear();
@@ -121,7 +116,7 @@ abstract class Adapter implements CacheAdapter
      */
     protected function setChain($key, $value, $ttl)
     {
-        $this->inMemoryAdapter->set($key, $value, $ttl);
+        InMemoryAdapter::getInstance()->set($key, $value, $ttl);
 
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->set($key, $value, $ttl);
@@ -133,7 +128,7 @@ abstract class Adapter implements CacheAdapter
      */
     protected function dropChain()
     {
-        $this->inMemoryAdapter->drop();
+        InMemoryAdapter::getInstance()->drop();
 
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->drop();
@@ -146,7 +141,7 @@ abstract class Adapter implements CacheAdapter
      */
     protected function deleteChain($key)
     {
-        $this->inMemoryAdapter->delete($key);
+        InMemoryAdapter::getInstance()->delete($key);
 
         if (null !== $this->nextAdapter) {
             $this->nextAdapter->delete($key);
