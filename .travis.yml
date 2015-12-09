@@ -30,7 +30,6 @@ after_script:
 
 script: 
   - bin/phpunit --coverage-text
-  - bin/phpunit-randomizer --order rand
   
 services:
     - redis-server
