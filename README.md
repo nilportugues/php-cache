@@ -86,7 +86,7 @@ Redis (PredisAdapter) is our main cache, in a dedicated server.
 Memcached (MemcachedAdapter) as fallback mechanism, available in the same machine as our PHP script.
 
 **Application cache**
-InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers. This comes enabled by default so you don't need to worry at all and is shared among all layers.
+InMemoryAdapter, used to avoid hiting the external caches on repeated operations and is shared by all cache layers. This comes enabled by default so you don't need to worry at all.
 
 
 #### 5.1. Configuration
